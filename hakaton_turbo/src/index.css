@@ -2,8 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
+html, body {
   margin: 0;
   padding: 0;
-  background: #1E1E1E;
+  overflow: hidden; /* Отключает скролл */
+  background-color: #1E1E1E;
+  height: 100%; /* Убедитесь, что элементы занимают всю высоту */
 }
