@@ -3,7 +3,7 @@ import React from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import IndexPage from './pages';
-import AddRule from './pages/Dashboard/add_rule';
+import AddRule from './pages/add_rule';
 
 function App() {
   const location = useLocation();
