@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, useAnimation } from 'framer-motion';
 
@@ -8,6 +8,11 @@ import actionButton from '@/assets/actionbutton.svg';
 function AddRule() {
   const navigate = useNavigate();
   const navControls = useAnimation();
+  const bottomButtonsControls = useAnimation();
+
+  // Состояние для отслеживания загрузки изображений
+  const [imagesLoadedCount, setImagesLoadedCount] = useState(0);
+  const imagesToLoad = 4; // Количество изображений
 
   useEffect(() => {
     // Анимация появления навбара при монтировании компонента
@@ -51,24 +56,69 @@ function AddRule() {
   };
 
   // Анимации для нижних кнопок
-  const bottomButtonVariants = {
-    initial: { opacity: 0, y: 100 },
-    animate: {
+  const bottomButtonContainerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
       opacity: 1,
-      y: 0,
-      transition: { duration: 0.5, ease: 'easeOut' },
+      transition: {
+        delay: 0.2, // Добавлена небольшая задержка
+        duration: 0.5,
+        ease: 'easeOut',
+        when: 'beforeChildren',
+        staggerChildren: 0.1,
+      },
+    },
+  };
+
+  // Анимационные варианты для левой кнопки
+  const leftButtonVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { duration: 0.3, ease: 'easeOut' },
     },
     whileHover: {
-      scale: 1.1,
-      rotate: 15,
+      scale: 1.05,
+      rotate: -10, // Наклон влево
       transition: { duration: 0.3 },
     },
     whileTap: {
-      scale: 0.9,
-      rotate: -15,
+      scale: 0.95,
+      rotate: -5, // Меньший наклон при нажатии
       transition: { duration: 0.1 },
     },
   };
+
+  // Анимационные варианты для правой кнопки
+  const rightButtonVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { duration: 0.3, ease: 'easeOut' },
+    },
+    whileHover: {
+      scale: 1.05,
+      rotate: 10, // Наклон вправо
+      transition: { duration: 0.3 },
+    },
+    whileTap: {
+      scale: 0.95,
+      rotate: 5, // Меньший наклон при нажатии
+      transition: { duration: 0.1 },
+    },
+  };
+
+  // Функция для отслеживания загрузки изображений
+  const handleImageLoad = () => {
+    setImagesLoadedCount((prev) => prev + 1);
+  };
+
+  useEffect(() => {
+    if (imagesLoadedCount === imagesToLoad) {
+      // Запускаем анимацию после загрузки всех изображений
+      bottomButtonsControls.start('visible');
+    }
+  }, [imagesLoadedCount, imagesToLoad, bottomButtonsControls]);
 
   return (
     <div className="bg-[#1E1E1E] min-h-screen font-sans">
@@ -100,17 +150,23 @@ function AddRule() {
       {/* Основной контент с анимацией */}
       <motion.div
         variants={pageVariants}
-        initial="initial"
+        initial={false}
         animate="animate"
         exit="exit"
         transition={pageTransition}
       >
+
         <div className="flex flex-col items-center justify-center min-h-[calc(100vh-100px)]">
           <div className="flex gap-32">
             {/* Блок "Choose your device" */}
             <div className="flex flex-col items-center text-center">
               <div className="w-14 h-14 rounded flex items-center justify-center mb-5">
-                <img src={deviceNotif} alt="Device Icon" className="w-20 h-20" />
+                <img
+                  src={deviceNotif}
+                  alt="Device Icon"
+                  className="w-20 h-20"
+                  onLoad={handleImageLoad}
+                />
               </div>
               <h3 className="text-[#F5F5F5] text-lg font-semibold mb-2">
                 Choose your device
@@ -124,7 +180,12 @@ function AddRule() {
             {/* Блок "Complete with the actions" */}
             <div className="flex flex-col items-center text-center">
               <div className="w-14 h-14 rounded flex items-center justify-center mb-5">
-                <img src={actionButton} alt="Action Icon" className="w-20 h-20" />
+                <img
+                  src={actionButton}
+                  alt="Action Icon"
+                  className="w-20 h-20"
+                  onLoad={handleImageLoad}
+                />
               </div>
               <h3 className="text-[#F5F5F5] text-lg font-semibold mb-2">
                 Complete with the actions
@@ -138,37 +199,48 @@ function AddRule() {
 
           {/* Нижние кнопки без рамки */}
           <motion.div
-            className="flex items-center justify-between w-[150px] h-[80px] px-4"
+            className="flex items-center justify-center w-full h-[80px] px-4"
             style={{
               position: 'fixed',
               bottom: '20px',
-              left: '46%',
-              transform: 'translateX(-70%)',
             }}
-            variants={bottomButtonVariants}
-            initial="initial"
-            animate="animate"
-            exit="exit"
+            variants={bottomButtonContainerVariants}
+            initial="hidden"
+            animate={bottomButtonsControls}
           >
-            {/* Левая кнопка Device */}
-            <motion.div
-              className="flex items-center justify-center w-[60px] h-[60px] cursor-pointer"
-              onClick={() => alert('Device Button clicked')}
-              whileHover={bottomButtonVariants.whileHover}
-              whileTap={bottomButtonVariants.whileTap}
-            >
-              <img src={deviceNotif} alt="Device Icon" className="w-[52px] h-[52px]" />
-            </motion.div>
+            <div className="flex items-center justify-between w-[120px]">
+              {/* Левая кнопка Device */}
+              <motion.div
+                className="flex items-center justify-center w-[60px] h-[60px] cursor-pointer"
+                onClick={() => alert('Device Button clicked')}
+                variants={leftButtonVariants}
+                whileHover="whileHover"
+                whileTap="whileTap"
+              >
+                <img
+                  src={deviceNotif}
+                  alt="Device Icon"
+                  className="w-[52px] h-[52px]"
+                  onLoad={handleImageLoad}
+                />
+              </motion.div>
 
-            {/* Правая кнопка Action */}
-            <motion.div
-              className="flex items-center justify-center w-[60px] h-[60px] cursor-pointer"
-              onClick={() => alert('Action Button clicked')}
-              whileHover={bottomButtonVariants.whileHover}
-              whileTap={bottomButtonVariants.whileTap}
-            >
-              <img src={actionButton} alt="Action Icon" className="w-[52px] h-[52px]" />
-            </motion.div>
+              {/* Правая кнопка Action */}
+              <motion.div
+                className="flex items-center justify-center w-[60px] h-[60px] cursor-pointer"
+                onClick={() => alert('Action Button clicked')}
+                variants={rightButtonVariants}
+                whileHover="whileHover"
+                whileTap="whileTap"
+              >
+                <img
+                  src={actionButton}
+                  alt="Action Icon"
+                  className="w-[52px] h-[52px]"
+                  onLoad={handleImageLoad}
+                />
+              </motion.div>
+            </div>
           </motion.div>
         </div>
       </motion.div>

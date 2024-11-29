@@ -5,21 +5,21 @@ import { useEffect, useState } from 'react';
 const animations = (direction) => ({
   initial: {
     opacity: 0,
-    x: direction === 'left' ? '-50vw' : '50vw',
+    x: direction === 'left' ? '-100%' : '100%',
   },
   animate: {
     opacity: 1,
-    x: 0,
+    x: '0%',
   },
   exit: {
     opacity: 0,
-    x: direction === 'left' ? '50vw' : '-50vw',
+    x: direction === 'left' ? '100%' : '-100%',
   },
 });
 
 const transition = {
-  duration: 0.25, // Увеличенная продолжительность для более плавного перехода
-  ease: 'easeOut', // Кривая Безье для плавной остановки
+  duration: 0.4, // Увеличенная продолжительность для плавности
+  ease: [0.43, 0.13, 0.23, 0.96], // Кастомная кривая Безье
 };
 
 const AnimatedPage = ({ children, direction = 'right' }) => {
@@ -41,6 +41,7 @@ const AnimatedPage = ({ children, direction = 'right' }) => {
         width: '100%',
         height: '100%',
         willChange: 'transform, opacity',
+        transform: 'translateZ(0)', // Промоутим элемент в свой слой
       }}
     >
       {children}
