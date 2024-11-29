@@ -1,12 +1,33 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, useAnimation } from 'framer-motion';
 
 import deviceNotif from '@/assets/Device Notif.svg';
 import actionButton from '@/assets/actionbutton.svg';
 
 function AddRule() {
   const navigate = useNavigate();
+  const navControls = useAnimation();
+
+  useEffect(() => {
+    // Анимация появления навбара при монтировании компонента
+    navControls.start({
+      y: 0,
+      opacity: 1,
+      transition: { duration: 0.25, ease: 'easeOut', bounce: 0.3 },
+    });
+  }, [navControls]);
+
+  const handleBackClick = async () => {
+    // Анимация ухода навбара вверх при нажатии на кнопку
+    await navControls.start({
+      y: -100,
+      opacity: 0,
+      transition: { duration: 0.25, ease: 'easeIn' },
+    });
+    // Навигация на предыдущую страницу после завершения анимации
+    navigate('/');
+  };
 
   // Анимации для страницы
   const pageVariants = {
@@ -29,52 +50,52 @@ function AddRule() {
     ease: 'easeOut',
   };
 
-  // Анимации для кнопок
-  const buttonVariants = {
-    initial: { opacity: 0, y: 50 },
+  // Анимации для нижних кнопок
+  const bottomButtonVariants = {
+    initial: { opacity: 0, y: 100 },
     animate: {
       opacity: 1,
       y: 0,
-      transition: { delay: 0.2 },
+      transition: { duration: 0.5, ease: 'easeOut' },
     },
-    exit: {
-      opacity: 0,
-      y: 50,
-      transition: { duration: 0.25, ease: 'easeOut' },
-    },
-  };
-
-  const buttonHoverTapVariants = {
-    hover: {
+    whileHover: {
       scale: 1.1,
-      transition: {
-        duration: 0.2,
-        ease: 'easeInOut',
-      },
+      rotate: 15,
+      transition: { duration: 0.3 },
     },
-    tap: {
-      scale: 0.95,
-      transition: {
-        duration: 0.1,
-        ease: 'easeInOut',
-      },
+    whileTap: {
+      scale: 0.9,
+      rotate: -15,
+      transition: { duration: 0.1 },
     },
   };
 
   return (
     <div className="bg-[#1E1E1E] min-h-screen font-sans">
-      {/* Верхняя панель (навбар) без анимации */}
-      <div className="px-8 py-6 bg-[#2B2B2B] flex justify-between items-center border-b border-[#3A3A3A]">
-        <button onClick={() => navigate('/')} className="flex items-center gap-4">
+      {/* Анимированный навбар */}
+      <motion.div
+        className="px-8 py-6 bg-[#2B2B2B] flex justify-between items-center"
+        initial={{ y: -200, opacity: 0 }}
+        animate={navControls}
+      >
+        <motion.button
+          onClick={handleBackClick}
+          className="flex items-center gap-4 text-[#F5F5F5] text-2xl font-light tracking-wide"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
           <span className="text-[#F5F5F5] text-xl">←</span>
-          <span className="text-[#F5F5F5] text-2xl font-light tracking-wide">
-            New Rule
-          </span>
-        </button>
-        <button className="bg-[#FF4D00] hover:bg-[#cc3d00] text-white px-6 py-2.5 rounded-lg text-[15px] transition-colors duration-200 font-medium">
+          <span>New Rule</span>
+        </motion.button>
+        <motion.button
+          className="bg-[#FF4D00] text-white px-6 py-2.5 rounded-lg text-[15px] font-medium"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => alert('Save Rule clicked')}
+        >
           Save Rule
-        </button>
-      </div>
+        </motion.button>
+      </motion.div>
 
       {/* Основной контент с анимацией */}
       <motion.div
@@ -115,16 +136,16 @@ function AddRule() {
             </div>
           </div>
 
+          {/* Нижние кнопки без рамки */}
           <motion.div
-            className="flex items-center justify-between w-[150px] h-[80px] rounded-xl shadow-lg px-4"
+            className="flex items-center justify-between w-[150px] h-[80px] px-4"
             style={{
-              position: 'fixed', // Зафиксировать кнопки
-              bottom: '20px',    // Отступ от нижнего края
-              left: '46%',       // Центрирование по горизонтали
-              transform: 'translateX(-70%)', // Центрирование с точным выравниванием
-              backgroundColor: 'rgba(23, 23, 23, 0.9)',
+              position: 'fixed',
+              bottom: '20px',
+              left: '46%',
+              transform: 'translateX(-70%)',
             }}
-            variants={buttonVariants}
+            variants={bottomButtonVariants}
             initial="initial"
             animate="animate"
             exit="exit"
@@ -133,9 +154,8 @@ function AddRule() {
             <motion.div
               className="flex items-center justify-center w-[60px] h-[60px] cursor-pointer"
               onClick={() => alert('Device Button clicked')}
-              whileHover="hover"
-              whileTap="tap"
-              variants={buttonHoverTapVariants}
+              whileHover={bottomButtonVariants.whileHover}
+              whileTap={bottomButtonVariants.whileTap}
             >
               <img src={deviceNotif} alt="Device Icon" className="w-[52px] h-[52px]" />
             </motion.div>
@@ -144,15 +164,12 @@ function AddRule() {
             <motion.div
               className="flex items-center justify-center w-[60px] h-[60px] cursor-pointer"
               onClick={() => alert('Action Button clicked')}
-              whileHover="hover"
-              whileTap="tap"
-              variants={buttonHoverTapVariants}
+              whileHover={bottomButtonVariants.whileHover}
+              whileTap={bottomButtonVariants.whileTap}
             >
               <img src={actionButton} alt="Action Icon" className="w-[52px] h-[52px]" />
             </motion.div>
           </motion.div>
-
-
         </div>
       </motion.div>
     </div>
