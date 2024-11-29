@@ -1,15 +1,14 @@
 import { useNavigate } from 'react-router-dom';
-import { motion, useAnimation } from 'framer-motion'; // Импортируем useAnimation
+import { motion, useAnimation } from 'framer-motion';
 import { useEffect } from 'react';
 import AnimatedPage from '@/components/ui/AnimatedPage';
 import birdIcon from '@/assets/Vector.svg';
 
-const IndexPage = () => {
+const EmptyPage = () => {
   const navigate = useNavigate();
   const navControls = useAnimation();
 
   useEffect(() => {
-    // Анимация появления навбара при монтировании компонента
     navControls.start({
       y: 0,
       opacity: 1,
@@ -18,21 +17,19 @@ const IndexPage = () => {
   }, [navControls]);
 
   const handleButtonClick = async () => {
-    // Анимация ухода навбара вверх при нажатии на кнопку
     await navControls.start({
       y: -100,
       opacity: 0,
       transition: { duration: 0.25, ease: 'easeIn' },
     });
-    // Навигация на страницу "Add Rule" после завершения анимации
     navigate('/add-rule');
   };
 
   return (
     <div className="bg-[#1E1E1E] h-screen overflow-hidden">
-      {/* Анимированный навбар */}
       <motion.div
-        className="px-8 py-6 bg-[#2B2B2B] flex justify-between items-center"
+        className="px-6 py-6 bg-transparent border-b flex justify-between items-center max-w-[calc(100%-20px)] mx-auto"
+        style={{ borderBottomColor: 'rgba(255, 255, 255, 0.5)' }}
         initial={{ y: -50, opacity: 0 }}
         animate={navControls}
       >
@@ -50,7 +47,6 @@ const IndexPage = () => {
         </motion.button>
       </motion.div>
 
-      {/* Основной контент */}
       <AnimatedPage>
         <div className="flex flex-col items-center justify-center h-[calc(100vh-82px)] text-[#808080]">
           <img
@@ -70,4 +66,4 @@ const IndexPage = () => {
   );
 };
 
-export default IndexPage;
+export default EmptyPage;

@@ -124,8 +124,9 @@ function AddRule() {
     <div className="bg-[#1E1E1E] min-h-screen font-sans">
       {/* Анимированный навбар */}
       <motion.div
-        className="px-8 py-6 bg-[#2B2B2B] flex justify-between items-center"
-        initial={{ y: -200, opacity: 0 }}
+        className="px-6 py-6 bg-transparent border-b flex justify-between items-center max-w-[calc(100%-20px)] mx-auto"
+        style={{ borderBottomColor: 'rgba(255, 255, 255, 0.5)' }}
+        initial={{ y: -50, opacity: 0 }}
         animate={navControls}
       >
         <motion.button
