@@ -9,8 +9,11 @@ export default {
       colors: {
         'dark-gray': '#1E1E1E',
         'light-gray': '#2B2B2B',
-        'accent-orange': '#FF4D00'
-      }
+        'accent-orange': '#FF4D00',
+      },
+      fontFamily: {
+        sans: ['Roboto', 'ui-sans-serif', 'system-ui'], // Подключаем шрифт Roboto
+      },
     },
   },
   plugins: [],
