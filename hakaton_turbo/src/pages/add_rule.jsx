@@ -1,4 +1,3 @@
-// AddRule.jsx
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -30,7 +29,7 @@ function AddRule() {
     ease: 'easeOut',
   };
 
-  // Анимации для нижних кнопок
+  // Анимации для кнопок
   const buttonVariants = {
     initial: { opacity: 0, y: 50 },
     animate: {
@@ -85,7 +84,7 @@ function AddRule() {
         exit="exit"
         transition={pageTransition}
       >
-        <div className="flex justify-center items-center min-h-[calc(100vh-100px)]">
+        <div className="flex flex-col items-center justify-center min-h-[calc(100vh-100px)]">
           <div className="flex gap-32">
             {/* Блок "Choose your device" */}
             <div className="flex flex-col items-center text-center">
@@ -115,41 +114,46 @@ function AddRule() {
               </p>
             </div>
           </div>
+
+          <motion.div
+            className="flex items-center justify-between w-[150px] h-[80px] rounded-xl shadow-lg px-4"
+            style={{
+              position: 'fixed', // Зафиксировать кнопки
+              bottom: '20px',    // Отступ от нижнего края
+              left: '46%',       // Центрирование по горизонтали
+              transform: 'translateX(-70%)', // Центрирование с точным выравниванием
+              backgroundColor: 'rgba(23, 23, 23, 0.9)',
+            }}
+            variants={buttonVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+          >
+            {/* Левая кнопка Device */}
+            <motion.div
+              className="flex items-center justify-center w-[60px] h-[60px] cursor-pointer"
+              onClick={() => alert('Device Button clicked')}
+              whileHover="hover"
+              whileTap="tap"
+              variants={buttonHoverTapVariants}
+            >
+              <img src={deviceNotif} alt="Device Icon" className="w-[52px] h-[52px]" />
+            </motion.div>
+
+            {/* Правая кнопка Action */}
+            <motion.div
+              className="flex items-center justify-center w-[60px] h-[60px] cursor-pointer"
+              onClick={() => alert('Action Button clicked')}
+              whileHover="hover"
+              whileTap="tap"
+              variants={buttonHoverTapVariants}
+            >
+              <img src={actionButton} alt="Action Icon" className="w-[52px] h-[52px]" />
+            </motion.div>
+          </motion.div>
+
+
         </div>
-
-        {/* Нижние иконки с анимацией */}
-        <motion.div
-          className="fixed bottom-8 left-1/2 transform -translate-x-1/2 flex items-center justify-between w-[150px] h-[80px] rounded-xl shadow-lg px-4"
-          style={{
-            backgroundColor: 'rgba(23, 23, 23, 0.9)',
-          }}
-          variants={buttonVariants}
-          initial="initial"
-          animate="animate"
-          exit="exit"
-        >
-          {/* Левая кнопка Device */}
-          <motion.div
-            className="flex items-center justify-center w-[60px] h-[60px] cursor-pointer"
-            onClick={() => alert('Device Button clicked')}
-            whileHover="hover"
-            whileTap="tap"
-            variants={buttonHoverTapVariants}
-          >
-            <img src={deviceNotif} alt="Device Icon" className="w-[52px] h-[52px]" />
-          </motion.div>
-
-          {/* Правая кнопка Action */}
-          <motion.div
-            className="flex items-center justify-center w-[60px] h-[60px] cursor-pointer"
-            onClick={() => alert('Action Button clicked')}
-            whileHover="hover"
-            whileTap="tap"
-            variants={buttonHoverTapVariants}
-          >
-            <img src={actionButton} alt="Action Icon" className="w-[52px] h-[52px]" />
-          </motion.div>
-        </motion.div>
       </motion.div>
     </div>
   );
