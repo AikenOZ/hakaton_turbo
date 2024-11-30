@@ -44,6 +44,8 @@ const DeviceModal = ({ isOpen, onClose }) => {
   const [deviceType, setDeviceType] = useState('All types');
   const [deviceLocation, setDeviceLocation] = useState('All locations');
   const [searchQuery, setSearchQuery] = useState('');
+  const [currentDeviceIndex, setCurrentDeviceIndex] = useState(0);
+  const [isSettingsModalOpen, setSettingsModalOpen] = useState(false);
 
   const handleDeviceSelect = (device) => {
     setSelectedDevices((prevSelectedDevices) =>
@@ -51,6 +53,24 @@ const DeviceModal = ({ isOpen, onClose }) => {
         ? prevSelectedDevices.filter((d) => d.name !== device.name)
         : [...prevSelectedDevices, device]
     );
+  };
+
+  const openSettingsModal = () => {
+    if (selectedDevices.length > 0) {
+      setCurrentDeviceIndex(0);
+      setSettingsModalOpen(true);
+    } else {
+      alert('Пожалуйста, выберите хотя бы одно устройство.');
+    }
+  };
+
+  const closeSettingsModal = () => {
+    if (currentDeviceIndex < selectedDevices.length - 1) {
+      setCurrentDeviceIndex((prevIndex) => prevIndex + 1);
+    } else {
+      setSettingsModalOpen(false);
+      setCurrentDeviceIndex(0);
+    }
   };
 
   const filteredDevices = devices.filter((device) => {
@@ -128,35 +148,31 @@ const DeviceModal = ({ isOpen, onClose }) => {
           ))}
         </div>
 
+
         <div className="flex justify-between items-center mt-4">
-          <button
-            onClick={onClose}
-            className="bg-[#FF4D00] text-white px-6 py-2 rounded"
-          >
+          <button onClick={onClose} className="bg-[#FF4D00] text-white px-6 py-2 rounded">
             Close
           </button>
           <button
-            onClick={() => {
-              if (selectedDevices.length > 0) {
-                alert(
-                  `Devices selected: ${selectedDevices
-                    .map((device) => device.name)
-                    .join(', ')}`
-                );
-              } else {
-                alert('No devices selected.');
-              }
-            }}
+            onClick={openSettingsModal}
             className="bg-[#FF6F00] text-white px-6 py-2 rounded"
           >
             Choose ({selectedDevices.length})
           </button>
         </div>
       </div>
+
+      {/* Модалка настроек для выбранных устройств */}
+      {isSettingsModalOpen && (
+        <DeviceSettingsModal
+          isOpen={isSettingsModalOpen}
+          device={selectedDevices[currentDeviceIndex]}
+          onClose={closeSettingsModal}
+        />
+      )}
     </div>
   );
 };
-
 
 // Модальное окно для добавления действий
 const ActionModal = ({ isOpen, onClose }) => {
@@ -388,7 +404,7 @@ function AddRule() {
   const [isActionModalOpen, setActionModalOpen] = useState(false);
   const [isSaveRuleModalOpen, setSaveRuleModalOpen] = useState(false);
   const [isLogicModalOpen, setLogicModalOpen] = useState(false);
-  const [isSettingsModalOpen, setSettingsModalOpen] = useState(false);
+
   // Анимации для страницы
   const pageVariants = {
     initial: {
