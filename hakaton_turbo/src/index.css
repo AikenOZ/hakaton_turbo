@@ -104,3 +104,11 @@ ul {
       transform: translateY(0);
   }
 }
+
+.search-icon {
+  transition: transform 0.3s ease-out;
+}
+
+.search-icon:hover {
+  transform: translateX(2px) translateY(-2px) rotate(-5deg);
+}

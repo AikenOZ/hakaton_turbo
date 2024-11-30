@@ -1,93 +1,146 @@
-import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { DEVICE_TYPES } from "../../utils/deviceConstants";
+import React, { useState, useRef, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ChevronDown } from 'lucide-react';
 
-const CustomDropdown = ({ selectedType, setSelectedType }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [currentIndex, setCurrentIndex] = useState(
-    DEVICE_TYPES.indexOf(selectedType) || 0
-  );
+const CustomDropdown = ({ options, value, onChange, label }) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const dropdownRef = useRef(null);
 
-  const toggleDropdown = () => setIsOpen((prev) => !prev);
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setIsOpen(false);
+            }
+        };
 
-  const selectItem = (index) => {
-    setSelectedType(DEVICE_TYPES[index]);
-    setCurrentIndex(index);
-    setIsOpen(false);
-  };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
 
-  return (
-    <div className="relative w-64">
-      {/* Dropdown Button */}
-      <motion.button
-        onClick={toggleDropdown}
-        className="w-full bg-light-gray text-white py-3 px-4 rounded-lg flex items-center justify-between focus:outline-none hover:bg-gray-700 transition shadow-md"
-        whileHover={{
-          scale: 1.03,
-          boxShadow: "0px 4px 20px rgba(255, 255, 255, 0.15)",
-        }}
-        whileTap={{
-          scale: 0.98,
-        }}
-      >
-        <span>{selectedType}</span>
-        <motion.span
-          className="text-xl"
-          animate={{ rotate: isOpen ? 180 : 0 }}
-          transition={{ duration: 0.3 }}
-        >
-          ▼
-        </motion.span>
-      </motion.button>
+    const dropdownVariants = {
+        hidden: {
+            opacity: 0,
+            y: -5,
+            scale: 0.95,
+        },
+        visible: {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            transition: {
+                duration: 0.2,
+                ease: "easeOut",
+            }
+        },
+        exit: {
+            opacity: 0,
+            y: -5,
+            scale: 0.95,
+            transition: {
+                duration: 0.15,
+                ease: "easeIn",
+            }
+        }
+    };
 
-      {/* Dropdown Menu */}
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -10, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -10, scale: 0.95 }}
-            transition={{ duration: 0.4, ease: "easeOut" }}
-            className="absolute top-full left-0 w-full mt-2 bg-dark-gray rounded-lg shadow-xl overflow-hidden z-50"
-          >
-            <div className="relative h-56 overflow-y-auto scrollbar-hide">
-              <ul
-                className="flex flex-col items-center"
-                style={{
-                  transformStyle: "preserve-3d",
-                  transform: `translateY(calc(-${currentIndex} * 48px))`,
-                  transition: "transform 0.4s cubic-bezier(0.25, 1, 0.5, 1)",
-                }}
-              >
-                {DEVICE_TYPES.map((type, index) => (
-                  <motion.li
-                    key={type}
-                    className={`text-center py-3 text-lg cursor-pointer select-none transition-all ${
-                      index === currentIndex
-                        ? "text-white font-semibold scale-110"
-                        : "text-gray-500"
-                    }`}
-                    style={{
-                      transform: `rotateX(${(index - currentIndex) * 15}deg)`,
-                      opacity: index === currentIndex ? 1 : 0.5,
-                    }}
-                    onClick={() => selectItem(index)}
-                    whileHover={{
-                      scale: 1.15,
-                      color: "#FF4D00",
-                      textShadow: "0px 4px 20px rgba(255, 77, 0, 0.8)",
-                    }}
-                  >
-                    {type}
-                  </motion.li>
-                ))}
-              </ul>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
+    const itemVariants = {
+        hidden: {
+            opacity: 0,
+            x: -4,
+        },
+        visible: (custom) => ({
+            opacity: 1,
+            x: 0,
+            transition: {
+                delay: custom * 0.03,
+                duration: 0.15,
+            }
+        }),
+        hover: {
+            x: 2,
+            transition: {
+                duration: 0.2,
+            }
+        }
+    };
+
+    return (
+        <div className="relative w-full" ref={dropdownRef}>
+            <motion.button
+                onClick={() => setIsOpen(!isOpen)}
+                className={`w-full px-4 py-2.5 rounded-lg bg-[#2A2A2A] border border-[#3A3A3A] 
+                text-left flex items-center justify-between text-[#F5F5F5] 
+                hover:bg-[#333333] focus:outline-none transition-all duration-200
+                ${isOpen ? 'ring-2 ring-[#FF4D00] ring-opacity-50' : ''}`}
+                whileHover={{ scale: 1.01 }}
+                whileTap={{ scale: 0.99 }}
+            >
+                <span className="text-sm font-medium truncate">{value || label}</span>
+                <motion.div
+                    animate={{ rotate: isOpen ? 180 : 0 }}
+                    transition={{ duration: 0.2 }}
+                >
+                    <ChevronDown className="w-4 h-4 text-[#808080]" />
+                </motion.div>
+            </motion.button>
+
+            <AnimatePresence>
+                {isOpen && (
+                    <motion.div
+                        variants={dropdownVariants}
+                        initial="hidden"
+                        animate="visible"
+                        exit="exit"
+                        className="absolute z-[100] w-full mt-2 rounded-lg bg-[#2A2A2A] border border-[#3A3A3A] shadow-lg overflow-hidden"
+                    >
+                        <div className="max-h-[240px] overflow-y-auto overflow-x-hidden custom-scrollbar">
+                            {options.map((option, index) => (
+                                <motion.button
+                                    key={option}
+                                    custom={index}
+                                    variants={itemVariants}
+                                    initial="hidden"
+                                    animate="visible"
+                                    whileHover="hover"
+                                    onClick={() => {
+                                        onChange(option);
+                                        setIsOpen(false);
+                                    }}
+                                    className={`w-full px-4 py-2.5 text-left text-sm transition-colors duration-150
+                                        ${value === option
+                                            ? 'bg-[#FF4D00] text-white'
+                                            : 'text-[#F5F5F5] hover:bg-[#333333]'
+                                        }`}
+                                >
+                                    <span className="block truncate">{option}</span>
+                                </motion.button>
+                            ))}
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            <style jsx>{`
+            .custom-scrollbar::-webkit-scrollbar {
+                width: 4px; // Уменьшаем ширину скроллбара
+            }
+            .custom-scrollbar::-webkit-scrollbar-track {
+                background: transparent; // Оставляем трек прозрачным
+            }
+            .custom-scrollbar::-webkit-scrollbar-thumb {
+                background: rgba(255, 255, 255, 0.1); // Полупрозрачный белый цвет
+                border-radius: 2px; // Уменьшаем радиус скругления
+                transition: background 0.3s ease; // Добавляем плавный переход
+            }
+            .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+                background: rgba(255, 255, 255, 0.3); // Увеличиваем яркость при наведении
+                box-shadow: 0 0 5px rgba(255, 255, 255, 0.5); // Добавляем легкое свечение
+            }
+        `}</style>
+        </div>
+    );
 };
 
 export default CustomDropdown;
