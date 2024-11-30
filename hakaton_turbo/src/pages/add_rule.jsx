@@ -216,6 +216,62 @@ const ActionModal = ({ isOpen, onClose }) => {
   );
 };
 
+// Модальное окно для сохранения правила
+const SaveRuleModal = ({ isOpen, onClose }) => {
+  const [ruleName, setRuleName] = useState('');
+  const [ruleDescription, setRuleDescription] = useState('');
+
+  if (!isOpen) return null;
+
+  const handleSave = () => {
+    if (ruleName.trim()) {
+      alert(`Rule saved: ${ruleName}\nDescription: ${ruleDescription}`);
+      onClose();
+    } else {
+      alert('Please provide a rule name.');
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+      <div className="bg-[#2B2B2B] p-8 rounded-lg w-[400px]">
+        <h3 className="text-[#F5F5F5] text-xl font-semibold mb-4">Save Rule</h3>
+        <div className="mb-4">
+          <label className="text-[#F5F5F5] block mb-2">Rule name</label>
+          <input
+            type="text"
+            placeholder="Type rule name here"
+            value={ruleName}
+            onChange={(e) => setRuleName(e.target.value)}
+            className="w-full bg-[#3A3A3A] text-[#F5F5F5] px-4 py-2 rounded mb-4"
+          />
+          <label className="text-[#F5F5F5] block mb-2">Description</label>
+          <textarea
+            placeholder="Type rule description here"
+            value={ruleDescription}
+            onChange={(e) => setRuleDescription(e.target.value)}
+            className="w-full bg-[#3A3A3A] text-[#F5F5F5] px-4 py-2 rounded"
+            rows="4"
+          ></textarea>
+        </div>
+        <div className="flex justify-between items-center mt-4">
+          <button
+            onClick={onClose}
+            className="bg-[#FF4D00] text-white px-6 py-2 rounded"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleSave}
+            className="bg-[#FF6F00] text-white px-6 py-2 rounded"
+          >
+            Create rule
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 function AddRule() {
   const navigate = useNavigate();
