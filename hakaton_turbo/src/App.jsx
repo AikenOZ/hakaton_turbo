@@ -26,6 +26,15 @@ function App() {
           </AnimatePresence>
         }
       />
+
+      <Route
+        path="/test-modals"
+        element={
+          <AnimatePresence mode="wait">
+            <AddRule key="test-modals" />
+          </AnimatePresence>
+        }
+      />
     </Routes>
   );
 }
