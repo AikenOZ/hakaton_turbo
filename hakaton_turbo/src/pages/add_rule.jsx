@@ -15,7 +15,6 @@ const DeviceSettingsModal = ({ isOpen, device, onClose }) => {
         <h3 className="text-[#F5F5F5] text-xl font-semibold mb-4">
           Settings for {device.name}
         </h3>
-        {/* Настройки для устройства */}
         <p className="text-[#808080]">Настройки устройства здесь</p>
         <button
           onClick={onClose}
@@ -27,7 +26,6 @@ const DeviceSettingsModal = ({ isOpen, device, onClose }) => {
     </div>
   );
 };
-
 
 // Модальное окно для выбора устройства
 const DeviceModal = ({ isOpen, onClose }) => {
@@ -43,21 +41,16 @@ const DeviceModal = ({ isOpen, onClose }) => {
   ];
 
   const [selectedDevices, setSelectedDevices] = useState([]);
-  const [deviceSettingsModalOpen, setDeviceSettingsModalOpen] = useState(false);
   const [deviceType, setDeviceType] = useState('All types');
   const [deviceLocation, setDeviceLocation] = useState('All locations');
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedDeviceForSettings, setSelectedDeviceForSettings] = useState(null);
-  const [isDeviceSettingsModalOpen, setIsDeviceSettingsModalOpen] = useState(false);
-  
+
   const handleDeviceSelect = (device) => {
     setSelectedDevices((prevSelectedDevices) =>
       prevSelectedDevices.some((d) => d.name === device.name)
         ? prevSelectedDevices.filter((d) => d.name !== device.name)
         : [...prevSelectedDevices, device]
     );
-    setSelectedDeviceForSettings(device);
-    setIsDeviceSettingsModalOpen(true);
   };
 
   const filteredDevices = devices.filter((device) => {
@@ -150,8 +143,6 @@ const DeviceModal = ({ isOpen, onClose }) => {
                     .map((device) => device.name)
                     .join(', ')}`
                 );
-                // Открытие модального окна для настройки устройства (пример)
-                setDeviceSettingsModalOpen(true);
               } else {
                 alert('No devices selected.');
               }
@@ -161,7 +152,6 @@ const DeviceModal = ({ isOpen, onClose }) => {
             Choose ({selectedDevices.length})
           </button>
         </div>
-
       </div>
     </div>
   );
