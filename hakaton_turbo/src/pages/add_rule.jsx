@@ -388,6 +388,7 @@ function AddRule() {
   const [isActionModalOpen, setActionModalOpen] = useState(false);
   const [isSaveRuleModalOpen, setSaveRuleModalOpen] = useState(false);
   const [isLogicModalOpen, setLogicModalOpen] = useState(false);
+  const [isSettingsModalOpen, setSettingsModalOpen] = useState(false);
   // Анимации для страницы
   const pageVariants = {
     initial: {
