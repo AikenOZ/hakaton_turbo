@@ -78,23 +78,32 @@ const IndexRulesPage = () => {
 
   return (
     <div className="bg-[#1E1E1E] h-screen overflow-hidden text-[#F5F5F5] relative">
-      <motion.div
-        className="px-6 py-6 bg-transparent border-b flex justify-between items-center max-w-[calc(100%-20px)] mx-auto"
-        style={{ borderBottomColor: 'rgba(255, 255, 255, 0.5)' }}
-        initial={{ y: -50, opacity: 0 }}
-        animate={navControls}
-      >
-        <h1 className="text-2xl font-light tracking-wide">Rules Engine</h1>
-        <motion.button
-          onClick={handleButtonClick}
-          className="bg-[#FF4D00] text-white px-6 py-2.5 rounded-lg flex items-center"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
+      <div className="relative">
+        <motion.div
+          className="px-6 py-6 bg-transparent flex justify-between items-center max-w-[calc(100%-20px)] mx-auto"
+          initial={{ y: -50, opacity: 0 }}
+          animate={navControls}
         >
-          <span className="text-2xl font-normal leading-none translate-y-[-2px] mr-3">+</span>
-          <span className="font-normal text-[15px]">Add Rule</span>
-        </motion.button>
-      </motion.div>
+          <h1 className="text-2xl font-light tracking-wide">Rules Engine</h1>
+          <motion.button
+            onClick={handleButtonClick}
+            className="bg-[#FF4D00] text-white px-6 py-2.5 rounded-lg flex items-center"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <span className="text-2xl font-normal leading-none translate-y-[-2px] mr-3">+</span>
+            <span className="font-normal text-[15px]">Add Rule</span>
+          </motion.button>
+        </motion.div>
+        <div 
+          className="absolute bottom-0 left-1/2 transform -translate-x-1/2"
+          style={{ 
+            width: 'calc(100% - 75px)',
+            height: '1px',
+            background: 'rgba(255, 255, 255, 0.5)'
+          }}
+        />
+      </div>
 
       <AnimatedPage>
         <div className="p-6">
