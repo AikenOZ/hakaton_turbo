@@ -31,7 +31,7 @@ function App() {
         path="/test-modals"
         element={
           <AnimatePresence mode="wait">
-            <AddRule key="test-modals" />
+            <AddRule key="add-rule" />
           </AnimatePresence>
         }
       />
