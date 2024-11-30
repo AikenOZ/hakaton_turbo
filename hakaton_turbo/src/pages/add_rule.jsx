@@ -7,29 +7,47 @@ import actionButton from '@/assets/actionbutton.svg';
 
 // Модальное окно для добавления условий к устройству
 const AddConditionModalSingle = ({ isOpen, device, onClose }) => {
-  const [conditions, setConditions] = useState([
-    { field: 'Temperature', state: '> Greater than', value: '12' },
-  ]);
-  const [logicalOperator, setLogicalOperator] = useState('AND');
+  // Состояние будет хранить условия в виде объекта, ключи - имена устройств
+  const [conditions, setConditions] = useState({
+    [device.name]: [
+      { field: 'Temperature', state: '> Greater than', value: '12' },
+    ],
+  });
+  const [logicalOperator, setLogicalOperator] = useState('AND'); // Начальное значение логического оператора
+
+  const deviceConditions = conditions[device.name] || [];
 
   const handleAddCondition = () => {
-    setConditions([...conditions, { field: '', state: '', value: '' }]);
+    setConditions((prev) => ({
+      ...prev,
+      [device.name]: [...deviceConditions, { field: '', state: '', value: '' }],
+    }));
   };
 
   const handleRemoveCondition = (index) => {
-    const newConditions = conditions.filter((_, i) => i !== index);
-    setConditions(newConditions);
+    const newConditions = deviceConditions.filter((_, i) => i !== index);
+    setConditions((prev) => ({
+      ...prev,
+      [device.name]: newConditions,
+    }));
   };
 
   const handleConditionChange = (index, key, value) => {
-    const newConditions = conditions.map((condition, i) =>
+    const newConditions = deviceConditions.map((condition, i) =>
       i === index ? { ...condition, [key]: value } : condition
     );
-    setConditions(newConditions);
+    setConditions((prev) => ({
+      ...prev,
+      [device.name]: newConditions,
+    }));
   };
 
   const handleSaveConditions = () => {
-    // Логика для обработки условия
+    if (deviceConditions.length === 0 || deviceConditions.some(({ field, state, value }) => !field || !state || !value)) {
+      alert('Пожалуйста, проверьте правильность заполнения условий.');
+      return;
+    }
+
     console.log('Conditions:', conditions, 'Logical Operator:', logicalOperator);
 
     // Закрытие модального окна после добавления условий
@@ -41,20 +59,10 @@ const AddConditionModalSingle = ({ isOpen, device, onClose }) => {
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
       <div className="bg-[#1E1E1E] text-white w-[600px] rounded-lg p-6">
-        <h2 className="text-lg font-semibold mb-4">Add conditions to {device?.name}</h2>
-
-        <div className="flex items-center gap-4 mb-6 p-4 bg-[#2B2B2B] rounded-lg">
-          <div className="w-12 h-12 bg-gray-700 rounded-full flex items-center justify-center">
-            <img src="/device-icon.png" alt="Device" className="w-8 h-8" />
-          </div>
-          <div>
-            <h3>{device?.name || 'Device Name'}</h3>
-            <p className="text-sm text-gray-400">{device?.type || 'Device Type'}</p>
-          </div>
-        </div>
+        <h2 className="text-lg font-semibold mb-4">Добавить условия для {device?.name}</h2>
 
         <div className="space-y-4">
-          {conditions.map((condition, index) => (
+          {deviceConditions.map((condition, index) => (
             <div key={index} className="flex items-center gap-4">
               <select
                 value={condition.field}
@@ -82,43 +90,49 @@ const AddConditionModalSingle = ({ isOpen, device, onClose }) => {
                 className="w-1/3 bg-[#2B2B2B] text-white p-2 rounded"
               />
 
-              <button
-                onClick={() => handleRemoveCondition(index)}
-                className="text-red-500"
-              >
-                🗑
-              </button>
+              <button onClick={() => handleRemoveCondition(index)} className="text-red-500">🗑</button>
             </div>
           ))}
+
+          {/* Отображение условий с логическим оператором между ними */}
+          {deviceConditions.length > 1 && (
+            <div className="text-center text-xl my-4">
+              {deviceConditions.map((_, index) => (
+                <span key={index}>
+                  {index > 0 && <span className="mx-2">{logicalOperator}</span>}
+                  <span>{deviceConditions[index].field} {deviceConditions[index].state} {deviceConditions[index].value}</span>
+                </span>
+              ))}
+            </div>
+          )}
         </div>
 
+        <button className="bg-gray-700 mt-4 px-4 py-2 rounded" onClick={handleAddCondition}>
+          Add condition
+        </button>
+
         <div className="flex items-center gap-4 mt-6">
-          <button
-            onClick={() => setLogicalOperator('AND')}
-            className={`px-4 py-2 rounded ${logicalOperator === 'AND' ? 'bg-[#FF6F00]' : 'bg-gray-700'}`}
-          >
+          <button onClick={() => setLogicalOperator('AND')} className={`px-4 py-2 rounded ${logicalOperator === 'AND' ? 'bg-[#FF6F00]' : 'bg-gray-700'}`}>
             + And
           </button>
-          <button
-            onClick={() => setLogicalOperator('OR')}
-            className={`px-4 py-2 rounded ${logicalOperator === 'OR' ? 'bg-[#FF6F00]' : 'bg-gray-700'}`}
-          >
+          <button onClick={() => setLogicalOperator('OR')} className={`px-4 py-2 rounded ${logicalOperator === 'OR' ? 'bg-[#FF6F00]' : 'bg-gray-700'}`}>
             + Or
           </button>
         </div>
 
+        <div className="mt-4 text-center">
+          <h3 className="text-lg">Выбранный логический оператор: <strong>{logicalOperator}</strong></h3>
+        </div>
+
         <div className="flex justify-between items-center mt-6">
-          <button onClick={onClose} className="bg-gray-700 px-6 py-2 rounded">
-            Back
-          </button>
-          <button onClick={handleSaveConditions} className="bg-[#FF6F00] px-6 py-2 rounded">
-            Add Conditions
-          </button>
+          <button onClick={onClose} className="bg-gray-700 px-6 py-2 rounded">Назад</button>
+          <button onClick={handleSaveConditions} className="bg-[#FF6F00] px-6 py-2 rounded">Добавить условия</button>
         </div>
       </div>
     </div>
   );
 };
+
 
 const DeviceSettingsModal = ({ isOpen, device, onClose }) => {
   if (!isOpen || !device) return null;
