@@ -28,6 +28,14 @@ const AddConditionModalSingle = ({ isOpen, device, onClose }) => {
     setConditions(newConditions);
   };
 
+  const handleSaveConditions = () => {
+    // Логика для обработки условия
+    console.log('Conditions:', conditions, 'Logical Operator:', logicalOperator);
+
+    // Закрытие модального окна после добавления условий
+    onClose();
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -50,9 +58,7 @@ const AddConditionModalSingle = ({ isOpen, device, onClose }) => {
             <div key={index} className="flex items-center gap-4">
               <select
                 value={condition.field}
-                onChange={(e) =>
-                  handleConditionChange(index, 'field', e.target.value)
-                }
+                onChange={(e) => handleConditionChange(index, 'field', e.target.value)}
                 className="w-1/3 bg-[#2B2B2B] text-white p-2 rounded"
               >
                 <option value="Temperature">Temperature</option>
@@ -61,9 +67,7 @@ const AddConditionModalSingle = ({ isOpen, device, onClose }) => {
 
               <select
                 value={condition.state}
-                onChange={(e) =>
-                  handleConditionChange(index, 'state', e.target.value)
-                }
+                onChange={(e) => handleConditionChange(index, 'state', e.target.value)}
                 className="w-1/3 bg-[#2B2B2B] text-white p-2 rounded"
               >
                 <option value="> Greater than">&gt; Greater than</option>
@@ -73,9 +77,7 @@ const AddConditionModalSingle = ({ isOpen, device, onClose }) => {
               <input
                 type="text"
                 value={condition.value}
-                onChange={(e) =>
-                  handleConditionChange(index, 'value', e.target.value)
-                }
+                onChange={(e) => handleConditionChange(index, 'value', e.target.value)}
                 placeholder="Value"
                 className="w-1/3 bg-[#2B2B2B] text-white p-2 rounded"
               />
@@ -93,30 +95,23 @@ const AddConditionModalSingle = ({ isOpen, device, onClose }) => {
         <div className="flex items-center gap-4 mt-6">
           <button
             onClick={() => setLogicalOperator('AND')}
-            className={`px-4 py-2 rounded ${logicalOperator === 'AND' ? 'bg-[#FF6F00]' : 'bg-gray-700'
-              }`}
+            className={`px-4 py-2 rounded ${logicalOperator === 'AND' ? 'bg-[#FF6F00]' : 'bg-gray-700'}`}
           >
             + And
           </button>
           <button
             onClick={() => setLogicalOperator('OR')}
-            className={`px-4 py-2 rounded ${logicalOperator === 'OR' ? 'bg-[#FF6F00]' : 'bg-gray-700'
-              }`}
+            className={`px-4 py-2 rounded ${logicalOperator === 'OR' ? 'bg-[#FF6F00]' : 'bg-gray-700'}`}
           >
             + Or
           </button>
         </div>
 
         <div className="flex justify-between items-center mt-6">
-          <button
-            onClick={onClose}
-            className="bg-gray-700 px-6 py-2 rounded"
-          >
+          <button onClick={onClose} className="bg-gray-700 px-6 py-2 rounded">
             Back
           </button>
-          <button
-            onClick={onClose}
-            className="bg-[#FF6F00] px-6 py-2 rounded">
+          <button onClick={handleSaveConditions} className="bg-[#FF6F00] px-6 py-2 rounded">
             Add Conditions
           </button>
         </div>
@@ -167,12 +162,22 @@ const DeviceModal = ({ isOpen, onClose, onAddCondition }) => {
   const [isSettingsModalOpen, setSettingsModalOpen] = useState(false);
 
   const handleDeviceSelect = (device) => {
+    // Изменяем здесь, чтобы просто добавлять устройство в состояние
+    const isSelected = selectedDevices.some((d) => d.name === device.name);
     setSelectedDevices((prevSelectedDevices) =>
-      prevSelectedDevices.some((d) => d.name === device.name)
+      isSelected
         ? prevSelectedDevices.filter((d) => d.name !== device.name)
         : [...prevSelectedDevices, device]
     );
-    onAddCondition(device); // Открыть модалку с условиями для выбранного устройства
+  };
+
+  const openConditionModal = () => {
+    // Теперь модальное окно для условий открывается только по нажатию на кнопку "Choose"
+    if (selectedDevices.length > 0) {
+      onAddCondition(selectedDevices[currentDeviceIndex]);
+    } else {
+      alert('Пожалуйста, выберите хотя бы одно устройство.');
+    }
   };
 
   const openSettingsModal = () => {
@@ -273,7 +278,7 @@ const DeviceModal = ({ isOpen, onClose, onAddCondition }) => {
             Close
           </button>
           <button
-            onClick={openSettingsModal}
+            onClick={openConditionModal} // Изменено на openConditionModal
             className="bg-[#FF6F00] text-white px-6 py-2 rounded"
           >
             Choose ({selectedDevices.length})
@@ -652,15 +657,15 @@ function AddRule() {
         </motion.div>
       </motion.div>
 
-      <DeviceModal 
-        isOpen={isDeviceModalOpen} 
-        onClose={() => setDeviceModalOpen(false)} 
-        onAddCondition={openConditionModal} 
+      <DeviceModal
+        isOpen={isDeviceModalOpen}
+        onClose={() => setDeviceModalOpen(false)}
+        onAddCondition={openConditionModal}
       />
-      <AddConditionModalSingle 
-        isOpen={isConditionModalOpen} 
-        device={currentDevice} 
-        onClose={() => setConditionModalOpen(false)} 
+      <AddConditionModalSingle
+        isOpen={isConditionModalOpen}
+        device={currentDevice}
+        onClose={() => setConditionModalOpen(false)}
       />
       <ActionModal isOpen={isActionModalOpen} onClose={() => setActionModalOpen(false)} />
       <SaveRuleModal isOpen={isSaveRuleModalOpen} onClose={() => setSaveRuleModalOpen(false)} />
