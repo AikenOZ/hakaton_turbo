@@ -5,6 +5,125 @@ import { motion } from 'framer-motion';
 import deviceNotif from '@/assets/Device Notif.svg';
 import actionButton from '@/assets/actionbutton.svg';
 
+// Модальное окно для добавления условий к устройству
+const AddConditionModalSingle = ({ isOpen, device, onClose }) => {
+  const [conditions, setConditions] = useState([
+    { field: 'Temperature', state: '> Greater than', value: '12' },
+  ]);
+  const [logicalOperator, setLogicalOperator] = useState('AND');
+
+  const handleAddCondition = () => {
+    setConditions([...conditions, { field: '', state: '', value: '' }]);
+  };
+
+  const handleRemoveCondition = (index) => {
+    const newConditions = conditions.filter((_, i) => i !== index);
+    setConditions(newConditions);
+  };
+
+  const handleConditionChange = (index, key, value) => {
+    const newConditions = conditions.map((condition, i) =>
+      i === index ? { ...condition, [key]: value } : condition
+    );
+    setConditions(newConditions);
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="bg-[#1E1E1E] text-white w-[600px] rounded-lg p-6">
+        <h2 className="text-lg font-semibold mb-4">Add conditions to {device?.name}</h2>
+
+        <div className="flex items-center gap-4 mb-6 p-4 bg-[#2B2B2B] rounded-lg">
+          <div className="w-12 h-12 bg-gray-700 rounded-full flex items-center justify-center">
+            <img src="/device-icon.png" alt="Device" className="w-8 h-8" />
+          </div>
+          <div>
+            <h3>{device?.name || 'Device Name'}</h3>
+            <p className="text-sm text-gray-400">{device?.type || 'Device Type'}</p>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          {conditions.map((condition, index) => (
+            <div key={index} className="flex items-center gap-4">
+              <select
+                value={condition.field}
+                onChange={(e) =>
+                  handleConditionChange(index, 'field', e.target.value)
+                }
+                className="w-1/3 bg-[#2B2B2B] text-white p-2 rounded"
+              >
+                <option value="Temperature">Temperature</option>
+                <option value="Humidity">Humidity</option>
+              </select>
+
+              <select
+                value={condition.state}
+                onChange={(e) =>
+                  handleConditionChange(index, 'state', e.target.value)
+                }
+                className="w-1/3 bg-[#2B2B2B] text-white p-2 rounded"
+              >
+                <option value="> Greater than">&gt; Greater than</option>
+                <option value="< Less than">&lt; Less than</option>
+              </select>
+
+              <input
+                type="text"
+                value={condition.value}
+                onChange={(e) =>
+                  handleConditionChange(index, 'value', e.target.value)
+                }
+                placeholder="Value"
+                className="w-1/3 bg-[#2B2B2B] text-white p-2 rounded"
+              />
+
+              <button
+                onClick={() => handleRemoveCondition(index)}
+                className="text-red-500"
+              >
+                🗑
+              </button>
+            </div>
+          ))}
+        </div>
+
+        <div className="flex items-center gap-4 mt-6">
+          <button
+            onClick={() => setLogicalOperator('AND')}
+            className={`px-4 py-2 rounded ${logicalOperator === 'AND' ? 'bg-[#FF6F00]' : 'bg-gray-700'
+              }`}
+          >
+            + And
+          </button>
+          <button
+            onClick={() => setLogicalOperator('OR')}
+            className={`px-4 py-2 rounded ${logicalOperator === 'OR' ? 'bg-[#FF6F00]' : 'bg-gray-700'
+              }`}
+          >
+            + Or
+          </button>
+        </div>
+
+        <div className="flex justify-between items-center mt-6">
+          <button
+            onClick={onClose}
+            className="bg-gray-700 px-6 py-2 rounded"
+          >
+            Back
+          </button>
+          <button
+            onClick={onClose}
+            className="bg-[#FF6F00] px-6 py-2 rounded">
+            Add Conditions
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const DeviceSettingsModal = ({ isOpen, device, onClose }) => {
   if (!isOpen || !device) return null;
@@ -28,7 +147,7 @@ const DeviceSettingsModal = ({ isOpen, device, onClose }) => {
 };
 
 // Модальное окно для выбора устройства
-const DeviceModal = ({ isOpen, onClose }) => {
+const DeviceModal = ({ isOpen, onClose, onAddCondition }) => {
   if (!isOpen) return null;
 
   const devices = [
@@ -53,6 +172,7 @@ const DeviceModal = ({ isOpen, onClose }) => {
         ? prevSelectedDevices.filter((d) => d.name !== device.name)
         : [...prevSelectedDevices, device]
     );
+    onAddCondition(device); // Открыть модалку с условиями для выбранного устройства
   };
 
   const openSettingsModal = () => {
@@ -147,7 +267,6 @@ const DeviceModal = ({ isOpen, onClose }) => {
             </button>
           ))}
         </div>
-
 
         <div className="flex justify-between items-center mt-4">
           <button onClick={onClose} className="bg-[#FF4D00] text-white px-6 py-2 rounded">
@@ -395,7 +514,7 @@ const LogicModal = ({ isOpen, onClose }) => {
   );
 };
 
-
+// Основная компонентная функция добавления правила
 function AddRule() {
   const navigate = useNavigate();
 
@@ -404,6 +523,13 @@ function AddRule() {
   const [isActionModalOpen, setActionModalOpen] = useState(false);
   const [isSaveRuleModalOpen, setSaveRuleModalOpen] = useState(false);
   const [isLogicModalOpen, setLogicModalOpen] = useState(false);
+  const [isConditionModalOpen, setConditionModalOpen] = useState(false);
+  const [currentDevice, setCurrentDevice] = useState(null);
+
+  const openConditionModal = (device) => {
+    setCurrentDevice(device);
+    setConditionModalOpen(true);
+  };
 
   // Анимации для страницы
   const pageVariants = {
@@ -526,17 +652,16 @@ function AddRule() {
         </motion.div>
       </motion.div>
 
-      <motion.div
-        className="flex items-center justify-center w-[60px] h-[60px] cursor-pointer"
-        onClick={() => setLogicModalOpen(true)}
-        whileHover="hover"
-        whileTap="tap"
-        variants={buttonHoverTapVariants}
-      >
-        <span className="text-[#F5F5F5]">Logic</span>
-      </motion.div>
-
-      <DeviceModal isOpen={isDeviceModalOpen} onClose={() => setDeviceModalOpen(false)} />
+      <DeviceModal 
+        isOpen={isDeviceModalOpen} 
+        onClose={() => setDeviceModalOpen(false)} 
+        onAddCondition={openConditionModal} 
+      />
+      <AddConditionModalSingle 
+        isOpen={isConditionModalOpen} 
+        device={currentDevice} 
+        onClose={() => setConditionModalOpen(false)} 
+      />
       <ActionModal isOpen={isActionModalOpen} onClose={() => setActionModalOpen(false)} />
       <SaveRuleModal isOpen={isSaveRuleModalOpen} onClose={() => setSaveRuleModalOpen(false)} />
       <LogicModal isOpen={isLogicModalOpen} onClose={() => setLogicModalOpen(false)} />
