@@ -47,13 +47,17 @@ const DeviceModal = ({ isOpen, onClose }) => {
   const [deviceType, setDeviceType] = useState('All types');
   const [deviceLocation, setDeviceLocation] = useState('All locations');
   const [searchQuery, setSearchQuery] = useState('');
-
+  const [selectedDeviceForSettings, setSelectedDeviceForSettings] = useState(null);
+  const [isDeviceSettingsModalOpen, setIsDeviceSettingsModalOpen] = useState(false);
+  
   const handleDeviceSelect = (device) => {
     setSelectedDevices((prevSelectedDevices) =>
       prevSelectedDevices.some((d) => d.name === device.name)
         ? prevSelectedDevices.filter((d) => d.name !== device.name)
         : [...prevSelectedDevices, device]
     );
+    setSelectedDeviceForSettings(device);
+    setIsDeviceSettingsModalOpen(true);
   };
 
   const filteredDevices = devices.filter((device) => {
