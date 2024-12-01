@@ -78,7 +78,6 @@ function AddRule() {
     }, 300);
   };
 
-
   useEffect(() => {
     navControls.start({
       y: 0,
