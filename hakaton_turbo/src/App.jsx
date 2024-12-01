@@ -4,6 +4,7 @@ import { AnimatePresence } from 'framer-motion';
 import IndexPage from './pages';
 import IndexRulesPage from './pages/index_rules';
 import AddRule from './pages/add_rule';
+import Canvas from './pages/canvas';
 
 function App() {
   const location = useLocation();
@@ -20,7 +21,6 @@ function App() {
         const data = response.default;
 
         if (isMounted) {
-          // Check if user exists and has rules array with items
           const userRules = data?.user?.rules;
           setHasRules(Array.isArray(userRules) && userRules.length > 0);
           setError(null);
@@ -73,17 +73,14 @@ function App() {
   }
 
   return (
-    <AnimatePresence mode="wait">
+    <AnimatePresence mode="wait" initial={false}>
       <Routes location={location} key={location.pathname}>
         <Route
           path="/"
           element={hasRules ? <IndexRulesPage /> : <IndexPage />}
         />
-        <Route
-          path="/add-rule"
-          element={<AddRule />}
-        />
-        {/* Catch any unknown routes and redirect to home */}
+        <Route path="/add-rule" element={<AddRule />} />
+        <Route path="/add-rule/canvas" element={<Canvas />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </AnimatePresence>

@@ -1,0 +1,48 @@
+{
+    "initialNodes": [
+      {
+        "id": "device-1",
+        "type": "device",
+        "position": { "x": 250, "y": 200 },
+        "data": {
+          "label": "QingPing1",
+          "type": "Weather Station",
+          "conditions": [
+            {
+              "field": "Temperature",
+              "operator": ">",
+              "value": "12°C"
+            },
+            {
+              "field": "Humidity",
+              "operator": ">", 
+              "value": "58%"
+            }
+          ]
+        }
+      },
+      {
+        "id": "action-1", 
+        "type": "action",
+        "position": { "x": 700, "y": 200 },
+        "data": {
+          "label": "Send e-mail",
+          "recipient": "address@gmail.com",
+          "type": "email",
+          "message": ""
+        }
+      }
+    ],
+    "initialEdges": [
+      {
+        "id": "e1-2",
+        "source": "device-1",
+        "target": "action-1",
+        "animated": true,
+        "style": {
+          "stroke": "#FF4D00"
+        },
+        "type": "smoothstep"
+      }
+    ]
+  }

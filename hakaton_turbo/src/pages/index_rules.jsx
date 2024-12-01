@@ -1,13 +1,14 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { createPortal } from 'react-dom';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, useAnimation, AnimatePresence } from 'framer-motion';
-import BurgerMenu from '@/pages/burger.jsx';
 import burgerIcon from '@/assets/burger.svg';
 import birdIcon from '@/assets/Vector.svg';
+import triggerIcon from '@/assets/Trigger Alert.svg';
+import editIcon from '@/assets/Edit.svg';
+import deleteIcon from '@/assets/Trash Delete.svg';
 import data from '@/utils/storage.json';
 
-// Определение анимационных вариантов
+// Animation variants
 const pageVariants = {
   initial: {
     opacity: 0,
@@ -28,25 +29,27 @@ const pageTransition = {
   ease: 'easeInOut',
 };
 
-const BurgerMenuPortal = ({ isOpen, buttonRef, onClose }) => {
-  if (!isOpen || !buttonRef.current) return null;
+const menuVariants = {
+  hidden: { opacity: 0, y: -10, scale: 0.95 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { duration: 0.2, ease: 'easeOut' },
+  },
+  exit: { opacity: 0, y: -10, scale: 0.95, transition: { duration: 0.15 } },
+};
 
-  const rect = buttonRef.current.getBoundingClientRect();
-
-  return createPortal(
-    <div
-      className="fixed bg-[#333] rounded-lg shadow-xl"
-      style={{
-        top: `${rect.bottom + 12}px`,
-        left: `${rect.right - 200}px`, // 200px - ширина меню
-        minWidth: '200px',
-        zIndex: 9999,
-      }}
-    >
-      <BurgerMenu isOpen onClose={onClose} />
-    </div>,
-    document.body
-  );
+const menuItemVariants = {
+  hover: {
+    scale: 1.02,
+    backgroundColor: 'rgba(75, 75, 75, 0.8)',
+    transition: { duration: 0.2 }
+  },
+  tap: {
+    scale: 0.98,
+    transition: { duration: 0.1 }
+  }
 };
 
 const IndexRulesPage = () => {
@@ -54,7 +57,6 @@ const IndexRulesPage = () => {
   const navControls = useAnimation();
   const [rules, setRules] = useState([]);
   const [openMenuId, setOpenMenuId] = useState(null);
-  const buttonRefs = useRef({});
   const [isExiting, setIsExiting] = useState(false);
 
   useEffect(() => {
@@ -68,12 +70,14 @@ const IndexRulesPage = () => {
     });
 
     const handleClickOutside = (event) => {
-      if (
-        openMenuId !== null &&
-        buttonRefs.current[openMenuId] &&
-        !buttonRefs.current[openMenuId].contains(event.target)
-      ) {
-        setOpenMenuId(null);
+      if (openMenuId !== null) {
+        const menuElement = document.getElementById(`menu-${openMenuId}`);
+        const burgerButton = document.getElementById(`burger-${openMenuId}`);
+        
+        if (menuElement && !menuElement.contains(event.target) && 
+            burgerButton && !burgerButton.contains(event.target)) {
+          setOpenMenuId(null);
+        }
       }
     };
 
@@ -92,13 +96,58 @@ const IndexRulesPage = () => {
     });
   };
 
-  const toggleMenu = (id) => {
-    setOpenMenuId((prev) => (prev === id ? null : id));
+  const handleTriggerClick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    navigate('/add-rule/canvas');
   };
 
-  const closeMenu = () => {
-    setOpenMenuId(null);
-  };
+  const BurgerMenuContent = ({ ruleId }) => (
+    <motion.div
+      id={`menu-${ruleId}`}
+      className="absolute right-0 mt-2 w-52 bg-[#2B2B2B]/90 rounded-lg shadow-lg text-white z-50 backdrop-blur-sm"
+      initial="hidden"
+      animate="visible"
+      exit="exit"
+      variants={menuVariants}
+    >
+      <ul className="flex flex-col py-2">
+        <motion.li
+          className="flex items-center px-4 py-3 cursor-pointer"
+          onClick={handleTriggerClick}
+          variants={menuItemVariants}
+          whileHover="hover"
+          whileTap="tap"
+          data-testid="trigger-menu-item"
+        >
+          <img src={triggerIcon} alt="Trigger" className="w-5 h-5 mr-3" />
+          <span className="text-sm leading-tight text-left">Trigger</span>
+        </motion.li>
+        
+        <motion.li
+          className="flex items-center px-4 py-3 cursor-pointer"
+          variants={menuItemVariants}
+          whileHover="hover"
+          whileTap="tap"
+        >
+          <img src={editIcon} alt="Edit" className="w-5 h-5 mr-3" />
+          <span className="text-sm leading-tight text-left">
+            Edit name or description
+          </span>
+        </motion.li>
+        
+        <motion.li
+          className="flex items-center px-4 py-3 cursor-pointer"
+          variants={menuItemVariants}
+          whileHover="hover"
+          whileTap="tap"
+        >
+          <img src={deleteIcon} alt="Delete" className="w-5 h-5 mr-3" />
+          <span className="text-sm leading-tight text-left">Delete</span>
+        </motion.li>
+      </ul>
+    </motion.div>
+  );
 
   return (
     <AnimatePresence mode="wait">
@@ -124,9 +173,7 @@ const IndexRulesPage = () => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              <span className="text-2xl font-normal leading-none translate-y-[-2px] mr-3">
-                +
-              </span>
+              <span className="text-2xl font-normal leading-none translate-y-[-2px] mr-3">+</span>
               <span className="font-normal text-[15px]">Add Rule</span>
             </motion.button>
           </motion.div>
@@ -158,9 +205,7 @@ const IndexRulesPage = () => {
                     <tr
                       key={rule.id}
                       className={`text-sm rounded-lg transition-all duration-300 ${
-                        openMenuId === rule.id
-                          ? ''
-                          : 'hover:shadow-lg hover:scale-[1.02]'
+                        openMenuId === rule.id ? '' : 'hover:shadow-lg hover:scale-[1.02]'
                       }`}
                       style={{
                         position: 'relative',
@@ -169,9 +214,7 @@ const IndexRulesPage = () => {
                     >
                       <td className="p-4">{rule.name}</td>
                       <td className="p-4">{rule.description}</td>
-                      <td className="p-4">
-                        {rule.connectedDevices.join(', ')}
-                      </td>
+                      <td className="p-4">{rule.connectedDevices.join(', ')}</td>
                       <td className="p-4 text-center">
                         <label className="relative inline-flex items-center cursor-pointer">
                           <input
@@ -185,8 +228,8 @@ const IndexRulesPage = () => {
                       <td className="p-4 text-right">
                         <div className="relative">
                           <button
-                            ref={(el) => (buttonRefs.current[rule.id] = el)}
-                            onClick={() => toggleMenu(rule.id)}
+                            id={`burger-${rule.id}`}
+                            onClick={() => setOpenMenuId(openMenuId === rule.id ? null : rule.id)}
                           >
                             <img
                               src={burgerIcon}
@@ -194,18 +237,15 @@ const IndexRulesPage = () => {
                               className="w-8 h-8"
                             />
                           </button>
+                          <AnimatePresence>
+                            {openMenuId === rule.id && <BurgerMenuContent ruleId={rule.id} />}
+                          </AnimatePresence>
                         </div>
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
-
-              <BurgerMenuPortal
-                isOpen={openMenuId !== null}
-                buttonRef={{ current: buttonRefs.current[openMenuId] }}
-                onClose={closeMenu}
-              />
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center h-[calc(100vh-82px)] text-[#808080]">
