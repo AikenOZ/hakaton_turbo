@@ -10,7 +10,6 @@ import ReactFlow, {
 } from 'reactflow';
 import { defaultEdgeStyles, edgeVariants } from './line';
 import 'reactflow/dist/style.css';
-import canvasData from './canvas.json';
 
 // Import components
 import DeviceModal from '@/components/Modals/DeviceModal';
@@ -38,6 +37,49 @@ import {
   nodeStyles,
   edgeStyles
 } from './styles';
+
+const defaultCanvasData = {
+  defaultNodes: {
+    device: {
+      defaultPosition: { x: 250, y: 200 },
+      defaultData: {
+        label: "DeviceName",
+        type: "Weather Station",
+        conditions: [
+          { field: "Temperature", operator: ">", value: "0°C" },
+          { field: "Humidity", operator: ">", value: "18%" }
+        ]
+      },
+      styles: {
+        background: "#2B2B2B",
+        color: "#F5F5F5",
+        border: "none",
+        borderRadius: "12px",
+        boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+        padding: "12px",
+        minWidth: "280px"
+      }
+    },
+    action: {
+      defaultPosition: { x: 700, y: 200 },
+      defaultData: {
+        label: "Send e-mail to",
+        recipient: "address@gmail.com",
+        type: "email"
+      },
+      styles: {
+        background: "#2B2B2B",
+        color: "#F5F5F5",
+        border: "none",
+        borderRadius: "16px",
+        boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+        padding: "12px",
+        minWidth: "240px"
+      }
+    }
+  },
+  rules: []
+};
 
 const NodeBurgerMenu = ({ nodeId }) => (
   <motion.div
@@ -80,6 +122,7 @@ function Canvas() {
   // Flow states
   const [currentRule, setCurrentRule] = useState(null);
   const [isExiting, setIsExiting] = useState(false);
+  const [canvasData, setCanvasData] = useState(defaultCanvasData);
   
   // Modal states
   const [isAnyModalOpen, setIsAnyModalOpen] = useState(false);
@@ -87,6 +130,16 @@ function Canvas() {
   const [isActionModalOpen, setActionModalOpen] = useState(false);
   const [isSaveRuleModalOpen, setSaveRuleModalOpen] = useState(false);
   const [isLogicModalOpen, setLogicModalOpen] = useState(false);
+
+  // Load canvas data from localStorage
+  useEffect(() => {
+    const storedData = localStorage.getItem('canvasData');
+    if (storedData) {
+      setCanvasData(JSON.parse(storedData));
+    } else {
+      localStorage.setItem('canvasData', JSON.stringify(defaultCanvasData));
+    }
+  }, []);
 
   const getInitialFlowData = () => {
     const getConditionsText = (conditions, logic = 'or') => (
@@ -166,12 +219,10 @@ function Canvas() {
   const [nodes, setNodes, onNodesChange] = useNodesState(flowData.nodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(flowData.edges);
 
-  // Удаление связи по двойному клику
   const onEdgeDoubleClick = useCallback((event, edge) => {
     setEdges((eds) => eds.filter((e) => e.id !== edge.id));
   }, [setEdges]);
 
-  // Создание связи с нужными стилями
   const onConnect = useCallback(
     (params, variant = 'default') => {
       const edgeStyle = variant === 'default' 
@@ -189,15 +240,16 @@ function Canvas() {
   );
 
   useEffect(() => {
-    if (ruleId) {
-      setCurrentRule(storageData.user.rules.find(r => r.id === ruleId));
+    if (ruleId && canvasData) {
+      const rule = canvasData.rules.find(r => r.id === ruleId);
+      setCurrentRule(rule || null);
     }
 
     const style = document.createElement('style');
     style.textContent = hideWatermark;
     document.head.appendChild(style);
     return () => document.head.removeChild(style);
-  }, [ruleId]);
+  }, [ruleId, canvasData]);
 
   useEffect(() => {
     navControls.start({
@@ -245,6 +297,19 @@ function Canvas() {
     const updatedRule = currentRule 
       ? { ...currentRule, ...formData }
       : { id: `rule-${Date.now()}`, ...formData, status: 'active' };
+
+    const newCanvasData = { ...canvasData };
+    if (currentRule) {
+      const ruleIndex = newCanvasData.rules.findIndex(r => r.id === currentRule.id);
+      if (ruleIndex !== -1) {
+        newCanvasData.rules[ruleIndex] = updatedRule;
+      }
+    } else {
+      newCanvasData.rules.push(updatedRule);
+    }
+
+    setCanvasData(newCanvasData);
+    localStorage.setItem('canvasData', JSON.stringify(newCanvasData));
 
     handleModalClose(setSaveRuleModalOpen);
     navigate('/');
