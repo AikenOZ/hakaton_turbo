@@ -1,10 +1,10 @@
 import React from 'react';
 import Modal from 'react-modal';
-import './AddConditionModal.css'; // Подключите стили
+import './AddCondition.css'; // Подключите стили
 
 Modal.setAppElement('#root');
 
-const AddConditionModal = ({ isOpen, onClose, selectedDevices }) => {
+const AddCondition = ({ isOpen, onClose, selectedDevices }) => {
     return (
         <Modal
             isOpen={isOpen}
@@ -41,4 +41,4 @@ const AddConditionModal = ({ isOpen, onClose, selectedDevices }) => {
     );
 };
 
-export default AddConditionModal;
+export default AddCondition;

@@ -7,7 +7,7 @@ import DeviceModal from '@/components/Modals/DeviceModal';
 import ActionModal from '@/components/Modals/ActionModal';
 import SaveRuleModal from '@/components/Modals/SaveRuleModal';
 import LogicModal from '@/components/Modals/LogicModal';
-import AddConditionModal from '@/components/Modals/AddConditionModal'; // Импортируйте новый компонент
+import AddCondition from '@/components/Modals/AddCondition/AddCondition';
 
 // Import assets
 import deviceNotif from '@/assets/Device Notif.svg';
@@ -66,7 +66,7 @@ function AddRule() {
   const [isActionModalOpen, setActionModalOpen] = useState(false);
   const [isSaveRuleModalOpen, setSaveRuleModalOpen] = useState(false);
   const [isLogicModalOpen, setLogicModalOpen] = useState(false);
-  const [isAddConditionModalOpen, setAddConditionModalOpen] = useState(false);
+  const [isAddConditionOpen, setAddConditionOpen] = useState(false);
   const [selectedDevices, setSelectedDevices] = useState([]); // Состояние для выбранных устройств
 
   useEffect(() => {
@@ -242,10 +242,10 @@ function AddRule() {
         <SaveRuleModal isOpen={isSaveRuleModalOpen} onClose={() => setSaveRuleModalOpen(false)} />
         <LogicModal isOpen={isLogicModalOpen} onClose={() => setLogicModalOpen(false)} />
         
-        {/* Добавляем AddConditionModal */}
-        <AddConditionModal 
-          isOpen={isAddConditionModalOpen} 
-          onClose={() => setAddConditionModalOpen(false)} 
+        {/* Добавляем AddCondition */}
+        <AddCondition 
+          isOpen={isAddConditionOpen} 
+          onClose={() => setAddConditionOpen(false)} 
           selectedDevices={selectedDevices} 
         />
       </motion.div>
