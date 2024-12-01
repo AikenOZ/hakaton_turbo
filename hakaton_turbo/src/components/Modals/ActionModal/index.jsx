@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import EmailIcon from '../../../assets/email.svg';
 import SMSIcon from '../../../assets/sms.svg';
 
@@ -18,6 +19,7 @@ const ACTION_ICONS = {
 };
 
 const ActionModal = ({ isOpen, onClose }) => {
+  const navigate = useNavigate(); // Инициализация useNavigate
   const [selectedAction, setSelectedAction] = useState(null);
   const [showActionForm, setShowActionForm] = useState(false);
   const [recipient, setRecipient] = useState('');
@@ -81,6 +83,10 @@ const ActionModal = ({ isOpen, onClose }) => {
   const handleSaveAction = () => {
     if (recipient && message) {
       console.log('Saving action:', { type: selectedAction, recipient, message });
+
+      // Редирект на /add-rule/canvas
+      navigate('/add-rule/canvas');
+
       handleClose();
     } else {
       alert('Please fill in all fields');

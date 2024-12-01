@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { SAVE_RULE_PLACEHOLDERS, SAVE_RULE_LABELS, SAVE_RULE_BUTTONS } from '@/utils/saveRuleConstants';
 
 const SaveRuleModal = ({ isOpen, onClose }) => {
+  const navigate = useNavigate(); // Инициализация useNavigate
   const [ruleName, setRuleName] = useState('');
   const [ruleDescription, setRuleDescription] = useState('');
   const [isVisible, setIsVisible] = useState(false);
@@ -57,7 +59,6 @@ const SaveRuleModal = ({ isOpen, onClose }) => {
       const existingRules = JSON.parse(localStorage.getItem('rules')) || [];
       existingRules.push(ruleData);
       localStorage.setItem('rules', JSON.stringify(existingRules));
-      handleClose();
     } catch (error) {
       console.error('Error saving rule:', error);
       alert('Failed to save rule');
@@ -67,6 +68,7 @@ const SaveRuleModal = ({ isOpen, onClose }) => {
   const handleSave = () => {
     if (ruleName.trim()) {
       saveRuleToJson();
+      navigate('/index-rules'); // Редирект на index_rules.jsx
     } else {
       alert('Please provide a rule name.');
     }
