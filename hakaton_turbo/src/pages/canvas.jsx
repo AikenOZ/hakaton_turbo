@@ -42,11 +42,12 @@ import {
 } from './styles';
 
 const nodeHandleStyles = {
-  background: '#FF4D00',
-  width: 5,
-  height: 5,
+  background: '#FFFFFF', // Белый цвет
+  width: 4, // Увеличение размера для более заметной точки
+  height: 4,
   borderRadius: '50%',
-  border: 'none'
+  boxShadow: '0 0 10px rgba(255, 77, 0, 0.5)', // Эффект подсветки
+  transition: 'transform 0.2s, opacity 0.2s', // Анимация
 };
 
 const invisibleHandleStyles = {
