@@ -65,15 +65,19 @@ function AddRule() {
   const [isActionModalOpen, setActionModalOpen] = useState(false);
   const [isSaveRuleModalOpen, setSaveRuleModalOpen] = useState(false);
   const [isLogicModalOpen, setLogicModalOpen] = useState(false);
-  
+
   const [isDeviceModalOpen, setDeviceModalOpen] = useState(false);
   const [isAddConditionOpen, setAddConditionOpen] = useState(false);
   const [selectedDevices, setSelectedDevices] = useState([]); // Состояние для выбранных устройств
 
   const handleDeviceSelect = (devices) => {
-    setSelectedDevices(devices); // Устанавливаем состояние с выбранными устройствами
-    setAddConditionOpen(true); // Открываем окно добавления условий
+    setSelectedDevices(devices); // Устанавливаем выбранные устройства
+    setDeviceModalOpen(false);  // Закрываем DeviceModal
+    setTimeout(() => {
+      setAddConditionOpen(true); // Через 300мс открываем AddCondition
+    }, 300);
   };
+
 
   useEffect(() => {
     navControls.start({
