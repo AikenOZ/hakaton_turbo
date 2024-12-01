@@ -1,0 +1,57 @@
+.modal {
+    background-color: #2b2b2b;
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: 400px; /* Ширина модального окна */
+    margin: auto;
+}
+
+.modal-title {
+    font-size: 20px;
+    margin-bottom: 20px;
+}
+
+.modal-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.default-container,
+.and-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.action-container {
+    display: flex;
+    gap: 10px;
+}
+
+.action {
+    background-color: #3c3c3c;
+    padding: 10px;
+    border-radius: 5px;
+    flex: 1; /* Увеличивает размеры кнопок для одинаковой ширины */
+}
+
+.measurement {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.add-button {
+    background-color: #ff6600;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+}

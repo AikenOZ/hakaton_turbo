@@ -7,6 +7,7 @@ import DeviceModal from '@/components/Modals/DeviceModal';
 import ActionModal from '@/components/Modals/ActionModal';
 import SaveRuleModal from '@/components/Modals/SaveRuleModal';
 import LogicModal from '@/components/Modals/LogicModal';
+import ChooseDeviceModal from '@/components/Modals/ChooseDeviceModal';
 
 // Import assets
 import deviceNotif from '@/assets/Device Notif.svg';
@@ -65,7 +66,9 @@ function AddRule() {
   const [isActionModalOpen, setActionModalOpen] = useState(false);
   const [isSaveRuleModalOpen, setSaveRuleModalOpen] = useState(false);
   const [isLogicModalOpen, setLogicModalOpen] = useState(false);
-
+  const [isChooseDeviceModalOpen, setChooseDeviceModalOpen] = useState(false);
+  const [selectedDevices, setSelectedDevices] = useState([]); // Состояние для выбранных устройств
+  
   useEffect(() => {
     navControls.start({
       y: 0,
@@ -93,9 +96,19 @@ function AddRule() {
     }
   }, [imagesLoadedCount, bottomButtonsControls]);
 
+  const handleChooseDeviceOpen = () => {
+    setChooseDeviceModalOpen(true);
+  };
+
+  const handleSelectDevice = (device) => {
+    if (!selectedDevices.includes(device)) {
+      setSelectedDevices([...selectedDevices, device]);
+    }
+  };
+
   return (
     <AnimatePresence mode="wait">
-      <motion.div 
+      <motion.div
         className="bg-[#1E1E1E] min-h-screen font-sans"
         variants={pageVariants}
         initial="initial"
@@ -128,9 +141,9 @@ function AddRule() {
               Save Rule
             </motion.button>
           </motion.div>
-          <div 
+          <div
             className="absolute bottom-0 left-1/2 transform -translate-x-1/2"
-            style={{ 
+            style={{
               width: 'calc(100% - 75px)',
               height: '1px',
               background: 'rgba(255, 255, 255, 0.5)'
@@ -141,12 +154,12 @@ function AddRule() {
         <div className="flex flex-col items-center justify-center min-h-[calc(100vh-100px)]">
           <div className="flex gap-32">
             <div className="flex flex-col items-center text-center">
-              <motion.div 
+              <motion.div
                 className="w-14 h-14 rounded flex items-center justify-center mb-5 cursor-pointer"
                 variants={centerIconVariants}
                 whileHover="whileHover"
                 whileTap="whileTap"
-                onClick={() => setDeviceModalOpen(true)}
+                onClick={handleChooseDeviceOpen} // Открытие модального окна выбора устройств
               >
                 <img
                   src={deviceNotif}
@@ -165,7 +178,7 @@ function AddRule() {
             </div>
 
             <div className="flex flex-col items-center text-center">
-              <motion.div 
+              <motion.div
                 className="w-14 h-14 rounded flex items-center justify-center mb-5 cursor-pointer"
                 variants={centerIconVariants}
                 whileHover="whileHover"
@@ -202,7 +215,7 @@ function AddRule() {
             <div className="flex items-center justify-between w-[120px]">
               <motion.div
                 className="flex items-center justify-center w-[60px] h-[60px] cursor-pointer"
-                onClick={() => setDeviceModalOpen(true)}
+                onClick={handleChooseDeviceOpen} // Открытие модального окна выбора устройств
                 variants={LEFT_BUTTON_VARIANTS}
                 whileHover="whileHover"
                 whileTap="whileTap"
@@ -238,6 +251,14 @@ function AddRule() {
         <ActionModal isOpen={isActionModalOpen} onClose={() => setActionModalOpen(false)} />
         <SaveRuleModal isOpen={isSaveRuleModalOpen} onClose={() => setSaveRuleModalOpen(false)} />
         <LogicModal isOpen={isLogicModalOpen} onClose={() => setLogicModalOpen(false)} />
+        
+        {/* Здесь мы открываем modальное окно для выбора устройств и передаем props */}
+        <ChooseDeviceModal 
+          isOpen={isChooseDeviceModalOpen} 
+          onClose={() => setChooseDeviceModalOpen(false)} 
+          selectedDevices={selectedDevices}
+          onSelectDevice={handleSelectDevice} // Передаем функцию для выбора устройства
+        />
       </motion.div>
     </AnimatePresence>
   );
