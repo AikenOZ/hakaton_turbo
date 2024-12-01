@@ -7,7 +7,7 @@ import DeviceModal from '@/components/Modals/DeviceModal';
 import ActionModal from '@/components/Modals/ActionModal';
 import SaveRuleModal from '@/components/Modals/SaveRuleModal';
 import LogicModal from '@/components/Modals/LogicModal';
-import AddCondition from '@/components/Modals/AddCondition/AddCondition';
+import AddCondition from '@/components/Modals/AddCondition';
 
 // Import assets
 import deviceNotif from '@/assets/Device Notif.svg';
@@ -62,12 +62,18 @@ function AddRule() {
   const imagesToLoad = 4;
 
   // Modal states
-  const [isDeviceModalOpen, setDeviceModalOpen] = useState(false);
   const [isActionModalOpen, setActionModalOpen] = useState(false);
   const [isSaveRuleModalOpen, setSaveRuleModalOpen] = useState(false);
   const [isLogicModalOpen, setLogicModalOpen] = useState(false);
+  
+  const [isDeviceModalOpen, setDeviceModalOpen] = useState(false);
   const [isAddConditionOpen, setAddConditionOpen] = useState(false);
   const [selectedDevices, setSelectedDevices] = useState([]); // Состояние для выбранных устройств
+
+  const handleDeviceSelect = (devices) => {
+    setSelectedDevices(devices); // Устанавливаем состояние с выбранными устройствами
+    setAddConditionOpen(true); // Открываем окно добавления условий
+  };
 
   useEffect(() => {
     navControls.start({
@@ -98,7 +104,7 @@ function AddRule() {
 
   return (
     <AnimatePresence mode="wait">
-      <motion.div 
+      <motion.div
         className="bg-[#1E1E1E] min-h-screen font-sans"
         variants={pageVariants}
         initial="initial"
@@ -131,9 +137,9 @@ function AddRule() {
               Save Rule
             </motion.button>
           </motion.div>
-          <div 
+          <div
             className="absolute bottom-0 left-1/2 transform -translate-x-1/2"
-            style={{ 
+            style={{
               width: 'calc(100% - 75px)',
               height: '1px',
               background: 'rgba(255, 255, 255, 0.5)'
@@ -144,7 +150,7 @@ function AddRule() {
         <div className="flex flex-col items-center justify-center min-h-[calc(100vh-100px)]">
           <div className="flex gap-32">
             <div className="flex flex-col items-center text-center">
-              <motion.div 
+              <motion.div
                 className="w-14 h-14 rounded flex items-center justify-center mb-5 cursor-pointer"
                 variants={centerIconVariants}
                 whileHover="whileHover"
@@ -168,7 +174,7 @@ function AddRule() {
             </div>
 
             <div className="flex flex-col items-center text-center">
-              <motion.div 
+              <motion.div
                 className="w-14 h-14 rounded flex items-center justify-center mb-5 cursor-pointer"
                 variants={centerIconVariants}
                 whileHover="whileHover"
@@ -237,16 +243,20 @@ function AddRule() {
         </div>
 
         {/* Modal components */}
-        <DeviceModal isOpen={isDeviceModalOpen} onClose={() => setDeviceModalOpen(false)} />
+        <DeviceModal
+          isOpen={isDeviceModalOpen}
+          onClose={() => setDeviceModalOpen(false)}
+          onDeviceSelect={handleDeviceSelect} // Передаем обработчик
+        />
         <ActionModal isOpen={isActionModalOpen} onClose={() => setActionModalOpen(false)} />
         <SaveRuleModal isOpen={isSaveRuleModalOpen} onClose={() => setSaveRuleModalOpen(false)} />
         <LogicModal isOpen={isLogicModalOpen} onClose={() => setLogicModalOpen(false)} />
-        
+
         {/* Добавляем AddCondition */}
-        <AddCondition 
-          isOpen={isAddConditionOpen} 
-          onClose={() => setAddConditionOpen(false)} 
-          selectedDevices={selectedDevices} 
+        <AddCondition
+          isOpen={isAddConditionOpen}
+          onClose={() => setAddConditionOpen(false)}
+          selectedDevices={selectedDevices}
         />
       </motion.div>
     </AnimatePresence>
