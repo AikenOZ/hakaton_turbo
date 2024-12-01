@@ -121,9 +121,8 @@ const DeviceModal = ({ isOpen, onClose }) => {
 
   return (
     <div
-      className={`fixed inset-0 flex items-center justify-center transition-all duration-300 ${
-        isOpen ? 'opacity-100' : 'opacity-0'
-      }`}
+      className={`fixed inset-0 flex items-center justify-center transition-all duration-300 ${isOpen ? 'opacity-100' : 'opacity-0'
+        }`}
       style={{
         backgroundColor: 'rgba(0, 0, 0, 0.75)',
         backdropFilter: 'blur(4px)',
@@ -131,9 +130,8 @@ const DeviceModal = ({ isOpen, onClose }) => {
       onClick={handleOverlayClick}
     >
       <div
-        className={`modal-content bg-[#1C1C1C] rounded-xl w-[480px] overflow-hidden transform transition-all duration-300 ${
-          isOpen ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-4 opacity-0 scale-95'
-        }`}
+        className={`modal-content bg-[#1C1C1C] rounded-xl w-[480px] overflow-hidden transform transition-all duration-300 ${isOpen ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-4 opacity-0 scale-95'
+          }`}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="p-6 space-y-6">
@@ -184,9 +182,8 @@ const DeviceModal = ({ isOpen, onClose }) => {
                 className="w-full bg-[#2B2B2B] text-white rounded-lg px-4 py-3 pl-11 text-sm placeholder-gray-400 transition-all duration-300 outline-none hover:bg-[#323232] focus:ring-2 focus:ring-[#FF4D00]"
               />
               <svg
-                className={`absolute left-4 top-3.5 h-5 w-5 transition-all duration-300 ${
-                  isSearchFocused ? 'text-[#FF4D00] scale-110' : 'text-gray-400'
-                } search-icon`}
+                className={`absolute left-4 top-3.5 h-5 w-5 transition-all duration-300 ${isSearchFocused ? 'text-[#FF4D00] scale-110' : 'text-gray-400'
+                  } search-icon`}
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -202,69 +199,75 @@ const DeviceModal = ({ isOpen, onClose }) => {
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-  {filteredDevices.map((device, index) => (
-    <button
-      key={device.name}
-      onClick={() => toggleDeviceSelection(device)}
-      className={`group flex flex-col items-center justify-center gap-2 w-full h-32 p-4 rounded-lg bg-[#2B2B2B] transition-all duration-300 transform hover:-translate-y-1 hover:bg-[#323232] animate-fadeInScale ${
-        selectedDevices.find((d) => d.name === device.name)
-          ? 'ring-2 ring-[#FF4D00] shadow-lg shadow-[#FF4D00]/20'
-          : ''
-      }`}
-      style={{ '--delay': `${0.3 + index * 0.1}s` }}
-    >
-      <div className="text-gray-400 transition-colors duration-300 group-hover:text-white">
-        {getDeviceIcon(device.type)}
-      </div>
-      <div className="text-center transition-transform duration-300 group-hover:translate-y-1">
-        <p
-          className={`text-sm font-medium transition-colors duration-300 ${
-            selectedDevices.find((d) => d.name === device.name)
-              ? 'text-[#FF4D00]'
-              : 'text-white group-hover:text-[#FF4D00]'
-          }`}
-        >
-          {device.name}
-        </p>
-        <p
-          className={`text-xs transition-colors duration-300 ${
-            selectedDevices.find((d) => d.name === device.name)
-              ? 'text-white'
-              : 'text-gray-400 group-hover:text-white'
-          }`}
-        >
-          {device.type}
-        </p>
-      </div>
-    </button>
-  ))}
-</div>
+            {filteredDevices.map((device, index) => (
+              <button
+                key={device.name}
+                onClick={() => toggleDeviceSelection(device)}
+                className={`group flex flex-col items-center justify-center gap-2 w-full h-32 p-4 rounded-lg bg-[#2B2B2B] transition-all duration-300 transform hover:-translate-y-1 hover:bg-[#323232] animate-fadeInScale ${selectedDevices.find((d) => d.name === device.name)
+                    ? 'ring-2 ring-[#FF4D00] shadow-lg shadow-[#FF4D00]/20'
+                    : ''
+                  }`}
+                style={{ '--delay': `${0.3 + index * 0.1}s` }}
+              >
+                <div className="text-gray-400 transition-colors duration-300 group-hover:text-white">
+                  {getDeviceIcon(device.type)}
+                </div>
+                <div className="text-center transition-transform duration-300 group-hover:translate-y-1">
+                  <p
+                    className={`text-sm font-medium transition-colors duration-300 ${selectedDevices.find((d) => d.name === device.name)
+                        ? 'text-[#FF4D00]'
+                        : 'text-white group-hover:text-[#FF4D00]'
+                      }`}
+                  >
+                    {device.name}
+                  </p>
+                  <p
+                    className={`text-xs transition-colors duration-300 ${selectedDevices.find((d) => d.name === device.name)
+                        ? 'text-white'
+                        : 'text-gray-400 group-hover:text-white'
+                      }`}
+                  >
+                    {device.type}
+                  </p>
+                </div>
+              </button>
+            ))}
+          </div>
 
         </div>
 
-        <div className="flex border-t border-[#2B2B2B]">
-  <button
-    onClick={handleClose}
-    className="flex-1 p-4 text-gray-400 text-sm font-medium transition-all duration-300 hover:bg-[#2B2B2B] hover:text-white"  
-  >
-    Close
-  </button>
-  <button
-    onClick={() => {
-      if (selectedDevices.length > 0) {
-        handleClose();
-      }
-    }}
-    disabled={selectedDevices.length === 0}
-    className={`flex-1 p-4 text-sm font-medium transition-all duration-300 ${
-      selectedDevices.length > 0
-        ? 'text-white bg-[#FF4D00] hover:bg-[#FF6A00]'
-        : 'text-gray-400 bg-[#2B2B2B] cursor-not-allowed'
-    }`}
-  >
-    Choose
-  </button>
-</div>
+        <div className="flex justify-between border-t border-[#2B2B2B] pt-4 p-6">
+          <button
+            onClick={handleClose}
+            className="px-8 py-4 text-gray-400 text-base font-medium bg-[#1C1C1C] rounded-lg transition-all duration-300 hover:bg-[#2B2B2B] hover:text-white"
+            style={{
+              width: '45%',
+              fontSize: '16px',
+              padding: '16px',
+            }}
+          >
+            Close
+          </button>
+          <button
+            onClick={() => {
+              if (selectedDevices.length > 0) {
+                handleClose();
+              }
+            }}
+            disabled={selectedDevices.length === 0}
+            className={`px-8 py-4 text-base font-medium rounded-lg transition-all duration-300 ${selectedDevices.length > 0
+                ? 'text-white bg-[#FF4D00] hover:bg-[#FF6A00]'
+                : 'text-gray-400 bg-[#2B2B2B] cursor-not-allowed'
+              }`}
+            style={{
+              width: '45%',
+              fontSize: '16px',
+              padding: '16px',
+            }}
+          >
+            Choose
+          </button>
+        </div>
       </div>
     </div>
   );
