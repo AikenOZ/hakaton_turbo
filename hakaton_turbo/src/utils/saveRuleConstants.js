@@ -11,5 +11,4 @@ export const SAVE_RULE_PLACEHOLDERS = {
   export const SAVE_RULE_BUTTONS = {
     CANCEL: 'Cancel',
     CREATE: 'Create rule',
-    DOWNLOAD: 'Download Rules JSON'
   };
