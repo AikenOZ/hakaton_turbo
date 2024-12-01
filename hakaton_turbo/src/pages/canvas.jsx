@@ -7,6 +7,8 @@ import ReactFlow, {
   useEdgesState,
   addEdge,
   MarkerType,
+  Position,
+  Handle
 } from 'reactflow';
 import { defaultEdgeStyles, edgeVariants } from './line';
 import 'reactflow/dist/style.css';
@@ -38,6 +40,109 @@ import {
   nodeStyles,
   edgeStyles
 } from './styles';
+
+const nodeHandleStyles = {
+  background: '#FF4D00',
+  width: 5,
+  height: 5,
+  borderRadius: '50%',
+  border: 'none'
+};
+
+const invisibleHandleStyles = {
+  background: 'transparent',
+  width: 18,
+  height: 18,
+  border: 'none'
+};
+
+const CustomNode = ({ data }) => {
+  const [isHovered, setIsHovered] = useState(false);
+
+  return (
+    <div
+      className="relative"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      {/* Top */}
+      <Handle
+        type="target"
+        position={Position.Top}
+        style={invisibleHandleStyles}
+        id="top-target"
+      />
+      <Handle
+        type="source"
+        position={Position.Top}
+        style={{
+          ...nodeHandleStyles,
+          opacity: isHovered ? 1 : 0.5,
+          transition: 'opacity 0.2s',
+        }}
+        id="top-source"
+      />
+
+      {/* Right */}
+      <Handle
+        type="target"
+        position={Position.Right}
+        style={invisibleHandleStyles}
+        id="right-target"
+      />
+      <Handle
+        type="source"
+        position={Position.Right}
+        style={{
+          ...nodeHandleStyles,
+          opacity: isHovered ? 1 : 0.5,
+          transition: 'opacity 0.2s',
+        }}
+        id="right-source"
+      />
+
+      {/* Bottom */}
+      <Handle
+        type="target"
+        position={Position.Bottom}
+        style={invisibleHandleStyles}
+        id="bottom-target"
+      />
+      <Handle
+        type="source"
+        position={Position.Bottom}
+        style={{
+          ...nodeHandleStyles,
+          opacity: isHovered ? 1 : 0.5,
+          transition: 'opacity 0.2s',
+        }}
+        id="bottom-source"
+      />
+
+      {/* Left */}
+      <Handle
+        type="target"
+        position={Position.Left}
+        style={invisibleHandleStyles}
+        id="left-target"
+      />
+      <Handle
+        type="source"
+        position={Position.Left}
+        style={{
+          ...nodeHandleStyles,
+          opacity: isHovered ? 1 : 0.5,
+          transition: 'opacity 0.2s',
+        }}
+        id="left-source"
+      />
+
+      <div className="bg-[#2B2B2B] rounded-lg">
+        {data.label}
+      </div>
+    </div>
+  );
+};
 
 const NodeBurgerMenu = ({ nodeId }) => (
   <motion.div
@@ -76,17 +181,22 @@ function Canvas() {
   const { ruleId } = useParams();
   const navControls = useAnimation();
   const [openNodeMenuId, setOpenNodeMenuId] = useState(null);
-  
+
   // Flow states
   const [currentRule, setCurrentRule] = useState(null);
   const [isExiting, setIsExiting] = useState(false);
-  
+
   // Modal states
   const [isAnyModalOpen, setIsAnyModalOpen] = useState(false);
   const [isDeviceModalOpen, setDeviceModalOpen] = useState(false);
   const [isActionModalOpen, setActionModalOpen] = useState(false);
   const [isSaveRuleModalOpen, setSaveRuleModalOpen] = useState(false);
   const [isLogicModalOpen, setLogicModalOpen] = useState(false);
+
+  // Node types definition
+  const nodeTypes = {
+    custom: CustomNode,
+  };
 
   const getInitialFlowData = () => {
     const getConditionsText = (conditions, logic = 'or') => (
@@ -99,16 +209,16 @@ function Canvas() {
         </React.Fragment>
       ))
     );
-  
+
     const createDeviceNode = (deviceData) => ({
       id: 'device-1',
-      type: 'default',
+      type: 'custom',
       position: canvasData.defaultNodes.device.defaultPosition,
       data: {
         label: (
           <div className="text-left p-2 relative">
             <div className="flex items-center gap-3 mb-4">
-                <div>
+              <div>
                 <div className="font-medium text-[15px]">{deviceData.label}</div>
                 <div className="text-sm text-gray-400">{deviceData.type}</div>
               </div>
@@ -124,10 +234,10 @@ function Canvas() {
       },
       style: canvasData.defaultNodes.device.styles,
     });
-    
+
     const createActionNode = (actionData) => ({
       id: 'action-1',
-      type: 'default',
+      type: 'custom',
       position: canvasData.defaultNodes.action.defaultPosition,
       data: {
         label: (
@@ -139,7 +249,7 @@ function Canvas() {
       },
       style: canvasData.defaultNodes.action.styles,
     });
-    
+
     if (ruleId) {
       const rule = canvasData.rules.find(r => r.id === ruleId);
       if (rule) {
@@ -152,7 +262,7 @@ function Canvas() {
         };
       }
     }
-  
+
     return {
       nodes: [
         createDeviceNode(canvasData.defaultNodes.device.defaultData),
@@ -166,31 +276,52 @@ function Canvas() {
   const [nodes, setNodes, onNodesChange] = useNodesState(flowData.nodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(flowData.edges);
 
-  // Удаление связи по двойному клику
   const onEdgeDoubleClick = useCallback((event, edge) => {
     setEdges((eds) => eds.filter((e) => e.id !== edge.id));
   }, [setEdges]);
 
-  // Создание связи с нужными стилями
+  const customEdgeStyles = {
+    ...defaultEdgeStyles,
+    stroke: '#FF4D00',
+    strokeWidth: 2,
+    markerEnd: {
+      type: MarkerType.ArrowClosed,
+      color: '#FF4D00',
+      width: 20,
+      height: 20,
+    },
+  };
+
   const onConnect = useCallback(
-    (params, variant = 'default') => {
-      const edgeStyle = variant === 'default' 
-        ? defaultEdgeStyles 
-        : edgeVariants[variant] || defaultEdgeStyles;
-        
+    (params) => {
       const newEdge = {
         ...params,
-        ...edgeStyle,
-        id: `edge-${params.source}-${params.target}`,
+        ...customEdgeStyles,
+        animated: true,
+        id: `edge-${params.source}-${params.target}-${params.sourceHandle}-${params.targetHandle}`,
       };
       setEdges((eds) => addEdge(newEdge, eds));
     },
     [setEdges]
   );
 
+  const isValidConnection = useCallback((connection) => {
+    if (connection.source === connection.target) {
+      return false;
+    }
+
+    return !edges.some(
+      edge =>
+        edge.source === connection.source &&
+        edge.target === connection.target &&
+        edge.sourceHandle === connection.sourceHandle &&
+        edge.targetHandle === connection.targetHandle
+    );
+  }, [edges]);
+
   useEffect(() => {
     if (ruleId) {
-      setCurrentRule(storageData.user.rules.find(r => r.id === ruleId));
+      setCurrentRule(canvasData.rules.find(r => r.id === ruleId));
     }
 
     const style = document.createElement('style');
@@ -208,8 +339,8 @@ function Canvas() {
   }, [navControls]);
 
   useEffect(() => {
-    setIsAnyModalOpen(isDeviceModalOpen || isActionModalOpen || 
-                     isSaveRuleModalOpen || isLogicModalOpen);
+    setIsAnyModalOpen(isDeviceModalOpen || isActionModalOpen ||
+      isSaveRuleModalOpen || isLogicModalOpen);
   }, [isDeviceModalOpen, isActionModalOpen, isSaveRuleModalOpen, isLogicModalOpen]);
 
   useEffect(() => {
@@ -217,14 +348,14 @@ function Canvas() {
       if (openNodeMenuId !== null) {
         const menuElement = document.getElementById(`menu-${openNodeMenuId}`);
         const burgerButton = document.getElementById(`burger-${openNodeMenuId}`);
-        
-        if (menuElement && !menuElement.contains(event.target) && 
-            burgerButton && !burgerButton.contains(event.target)) {
+
+        if (menuElement && !menuElement.contains(event.target) &&
+          burgerButton && !burgerButton.contains(event.target)) {
           setOpenNodeMenuId(null);
         }
       }
     };
-  
+
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [openNodeMenuId]);
@@ -242,7 +373,7 @@ function Canvas() {
   const handleModalClose = (setModalState) => setModalState(false);
 
   const handleSaveRule = (formData) => {
-    const updatedRule = currentRule 
+    const updatedRule = currentRule
       ? { ...currentRule, ...formData }
       : { id: `rule-${Date.now()}`, ...formData, status: 'active' };
 
@@ -252,7 +383,7 @@ function Canvas() {
 
   return (
     <AnimatePresence mode="wait">
-      <motion.div 
+      <motion.div
         className="bg-[#1E1E1E] min-h-screen font-sans"
         variants={pageVariants}
         initial="initial"
@@ -295,8 +426,11 @@ function Canvas() {
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}
             onEdgeDoubleClick={onEdgeDoubleClick}
+            nodeTypes={nodeTypes}
+            isValidConnection={isValidConnection}
             fitView
             proOptions={{ hideAttribution: true }}
+            defaultEdgeOptions={customEdgeStyles}
           >
             <Background color="#808080" gap={16} size={1} />
           </ReactFlow>
@@ -345,24 +479,24 @@ function Canvas() {
           )}
         </AnimatePresence>
 
-        <DeviceModal 
-          isOpen={isDeviceModalOpen} 
+        <DeviceModal
+          isOpen={isDeviceModalOpen}
           onClose={() => handleModalClose(setDeviceModalOpen)}
           currentRule={currentRule}
         />
-        <ActionModal 
-          isOpen={isActionModalOpen} 
+        <ActionModal
+          isOpen={isActionModalOpen}
           onClose={() => handleModalClose(setActionModalOpen)}
           currentRule={currentRule}
         />
-        <SaveRuleModal 
-          isOpen={isSaveRuleModalOpen} 
+        <SaveRuleModal
+          isOpen={isSaveRuleModalOpen}
           onClose={() => handleModalClose(setSaveRuleModalOpen)}
           onSave={handleSaveRule}
           currentRule={currentRule}
         />
-        <LogicModal 
-          isOpen={isLogicModalOpen} 
+        <LogicModal
+          isOpen={isLogicModalOpen}
           onClose={() => handleModalClose(setLogicModalOpen)}
           currentRule={currentRule}
         />
